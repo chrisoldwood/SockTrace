@@ -78,6 +78,10 @@ BEGIN
     BEGIN
         MENUITEM "&Clear Trace",                ID_VIEW_CLEAR_TRACE
     END
+    POPUP "&Tools"
+    BEGIN
+        MENUITEM "Edit HOSTS...",               ID_TOOLS_HOSTS
+    END
     POPUP "&Options"
     BEGIN
         MENUITEM "&Sockets...",                 ID_OPTIONS_SOCKET
@@ -125,7 +129,7 @@ END
 IDD_SOCK_OPTIONS DIALOGEX 0, 0, 327, 135
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Socket Settings"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     CONTROL         "List1",IDC_SOCKETS,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_NOSORTHEADER | 
@@ -267,6 +271,12 @@ STRINGTABLE DISCARDABLE
 BEGIN
     ID_VIEW_POPUP           "View options"
     ID_VIEW_CLEAR_TRACE     "Clear the trace window"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_TOOLS_POPUP          "Tools options"
+    ID_TOOLS_HOSTS          "Edit the HOSTS file"
 END
 
 #endif    // English (U.K.) resources
