@@ -13,10 +13,11 @@
 #define SOCKTRACEAPP_HPP
 
 // Template shorthands.
-typedef TPtrArray<CSockConfig>   CSockConfigs;
-typedef TPtrArray<CTCPSvrSocket> CTCPSvrSockets;
-typedef TPtrArray<CTCPSockPair>  CTCPCltSockets;
-typedef TPtrArray<CUDPSockPair>  CUDPSvrSockets;
+typedef TPtrArray<CSockConfig>     CSockConfigs;
+typedef TPtrArray<CTCPSvrSocket>   CTCPSvrSockets;
+typedef TPtrArray<CTCPSockPair>    CTCPCltSockets;
+typedef TPtrArray<CUDPSockPair>    CUDPSvrSockets;
+typedef TMap<CSocket*, CSockPair*> CSocketMap;
 
 /******************************************************************************
 ** 
@@ -25,7 +26,7 @@ typedef TPtrArray<CUDPSockPair>  CUDPSvrSockets;
 *******************************************************************************
 */
 
-class CSockTraceApp : public CApp
+class CSockTraceApp : public CApp, public IClientSocketListener, public IServerSocketListener
 {
 public:
 	//
@@ -40,7 +41,6 @@ public:
 	CAppWnd			m_AppWnd;			// Main window.
 	CAppCmds		m_AppCmds;			// Command handler.
 
-	uint			m_nTimerID;			// The background timer ID.
 	uint			m_nInstance;		// The instance counter.
 
 	CIniFile		m_oIniFile;			// .INI FIle
@@ -52,6 +52,7 @@ public:
 	CTCPSvrSockets	m_aoTCPSvrSocks;	// The TCP listener sockets.
 	CTCPCltSockets	m_aoTCPCltSocks;	// The TCP client <-> server sockets.
 	CUDPSvrSockets	m_aoUDPSvrSocks;	// The UDP client <-> server sockets.
+	CSocketMap		m_oSockMap;			// The socket -> socket pair map.
 
 	CPath			m_strTraceFile;		// Application trace file.
 
@@ -91,20 +92,15 @@ protected:
 	// Constants.
 	//
 	static const char* INI_FILE_VER;
-	static const uint  BG_TIMER_FREQ;
-
-	//
-	// The backgound timer methods.
-	//
-	virtual void OnTimer(uint nTimerID);
 
 	//
 	// Socket event handlers.
 	//
-	void HandleTCPConnects();
-	void HandleTCPPackets();
-	void HandleUDPPackets();
-	void HandleTCPDisconnects();
+	virtual void OnAcceptReady(CTCPSvrSocket* pSocket);
+	virtual void OnReadReady(CSocket* pSocket);
+	virtual void OnWriteReady(CSocket* pSocket);
+	virtual void OnClosed(CSocket* pSocket, int nReason);
+//	virtual void OnError(CSocket* pSocket, int nEvent, int nError);
 };
 
 /******************************************************************************
