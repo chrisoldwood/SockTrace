@@ -1,3 +1,7 @@
 - Switch from timer/polling sockets to Async/EventSelect().
 
-- Display host/address so that it can be copied.
+- Add double-click for editing config.
+
+- Warn if multiple ports set-up.
+
+- View logfiles command.
