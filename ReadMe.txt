@@ -1,4 +1,4 @@
-Socket Trace v1.1
+Socket Trace v1.5
 =================
 
 1) Installation.
@@ -21,4 +21,4 @@ Web:   http://www.cix.co.uk/~gort
 
 Chris Oldwood 
 
-19th June 2003
+6th July 2004
