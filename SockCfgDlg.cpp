@@ -125,6 +125,15 @@ bool CSockCfgDlg::OnOk()
 	// Get protocol type.
 	m_oConfig.m_nType = (m_oConfig.m_strType == "TCP") ? SOCK_STREAM : SOCK_DGRAM;
 
+	// Port already in use?
+	if ( ((m_oConfig.m_nType == SOCK_STREAM) && (m_anTCPPorts.Find(m_oConfig.m_nSrcPort) != -1))
+	  || ((m_oConfig.m_nType == SOCK_DGRAM ) && (m_anUDPPorts.Find(m_oConfig.m_nSrcPort) != -1)) )
+	{
+		AlertMsg("The local port '%d' has already been used.", m_oConfig.m_nSrcPort);
+		m_ebSrcPort.Focus();
+		return false;
+	}
+
 	return true;
 }
 

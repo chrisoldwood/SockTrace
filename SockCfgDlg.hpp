@@ -27,10 +27,15 @@ public:
 	//
 	CSockCfgDlg();
 	
+	// Template shorthands.
+	typedef TArray<uint> CUIntArray;
+
 	//
 	// Members.
 	//
-	CSockConfig	m_oConfig;
+	CSockConfig	m_oConfig;		// The config.
+	CUIntArray	m_anTCPPorts;	// TCP Ports already used.
+	CUIntArray	m_anUDPPorts;	// UDP Ports already used.
 	
 protected:
 	//
