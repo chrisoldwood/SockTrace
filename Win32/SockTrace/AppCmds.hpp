@@ -38,6 +38,9 @@ public:
 	// View menu.
 	void OnViewClearTrace();
 
+	// Tools menu.
+	void OnToolsEditHosts();
+
 	// Options menu.
 	void OnOptionsSocket();
 
