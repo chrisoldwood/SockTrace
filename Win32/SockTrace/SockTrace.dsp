@@ -110,7 +110,19 @@ SOURCE=.\AppWnd.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\Params.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\SockCfgDlg.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\SockOptsDlg.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\SockPair.cpp
 # End Source File
 # Begin Source File
 
@@ -142,7 +154,15 @@ SOURCE=.\AppWnd.hpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\Params.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\resource.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\SockCfgDlg.hpp
 # End Source File
 # Begin Source File
 
@@ -151,6 +171,10 @@ SOURCE=.\SockConfig.hpp
 # Begin Source File
 
 SOURCE=.\SockOptsDlg.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\SockPair.hpp
 # End Source File
 # Begin Source File
 
@@ -173,10 +197,6 @@ SOURCE=.\UDPSockPair.hpp
 SOURCE=.\App.ico
 # End Source File
 # End Group
-# Begin Source File
-
-SOURCE=.\SockTrace.ini
-# End Source File
 # Begin Source File
 
 SOURCE=.\TODO.txt
