@@ -1,0 +1,24 @@
+Socket Trace v1.1
+=================
+
+1) Installation.
+
+Copy the file SockTrace.exe to a folder.
+
+
+2) Uninstallation.
+
+Delete the files SockTrace.exe and SockTrace.ini.
+
+
+3) Manual/Help/Contact Info etc.
+
+There is no manual at present.
+
+EMail: gort@cix.co.uk
+Web:   http://www.cix.co.uk/~gort
+
+
+Chris Oldwood 
+
+19th June 2003
