@@ -23,8 +23,8 @@ CFG=SockTrace - Win32 Debug
 
 # Begin Project
 # PROP AllowPerConfigDependencies 0
-# PROP Scc_ProjName ""
-# PROP Scc_LocalPath ""
+# PROP Scc_ProjName ""$/Win32/SockTrace", EADAAAAA"
+# PROP Scc_LocalPath "."
 CPP=cl.exe
 MTL=midl.exe
 RSC=rc.exe
@@ -146,11 +146,23 @@ SOURCE=.\resource.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\SockConfig.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\SockOptsDlg.hpp
 # End Source File
 # Begin Source File
 
 SOURCE=.\SockTraceApp.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\TCPSockPair.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\UDPSockPair.hpp
 # End Source File
 # End Group
 # Begin Group "Resource Files"
@@ -161,5 +173,13 @@ SOURCE=.\SockTraceApp.hpp
 SOURCE=.\App.ico
 # End Source File
 # End Group
+# Begin Source File
+
+SOURCE=.\SockTrace.ini
+# End Source File
+# Begin Source File
+
+SOURCE=.\TODO.txt
+# End Source File
 # End Target
 # End Project
