@@ -41,9 +41,6 @@ const char* CSockTraceApp::VERSION      = "v1.0";
 const char* CSockTraceApp::INI_FILE_VER  = "1.0";
 const uint  CSockTraceApp::BG_TIMER_FREQ =  1;
 
-const char* CSockTraceApp::DEF_SEND_FILE = "Send.dat";
-const char* CSockTraceApp::DEF_RECV_FILE = "Recv.dat";
-
 /******************************************************************************
 ** Method:		Constructor
 **
@@ -59,13 +56,7 @@ const char* CSockTraceApp::DEF_RECV_FILE = "Recv.dat";
 CSockTraceApp::CSockTraceApp()
 	: CApp(m_AppWnd, m_AppCmds)
 	, m_nTimerID(0)
-	, m_nSrcPort(0)
-	, m_nDstPort(0)
-	, m_pTCPLstSock(NULL)
-	, m_pTCPInpSocket(NULL)
-	, m_pTCPOutSocket(NULL)
-	, m_pUDPInpSocket(NULL)
-	, m_pUDPOutSocket(NULL)
+	, m_nInstance(1)
 {
 }
 
@@ -83,6 +74,11 @@ CSockTraceApp::CSockTraceApp()
 
 CSockTraceApp::~CSockTraceApp()
 {
+	// Cleanup arrays.
+	m_aoConfigs.DeleteAll();
+	m_aoTCPSvrSocks.DeleteAll();
+	m_aoTCPCltSocks.DeleteAll();
+	m_aoUDPSvrSocks.DeleteAll();
 }
 
 /******************************************************************************
@@ -105,24 +101,19 @@ bool CSockTraceApp::OnOpen()
 	// Load settings.
 	LoadConfig();
 
-	// Create the full log file paths.
-	m_strSendPath = CPath(CPath::ApplicationDir(), m_strSendFile);
-	m_strRecvPath = CPath(CPath::ApplicationDir(), m_strRecvFile);
-
-	// Clear the log files.
 	try
 	{
-		CFile fSendFile, fRecvFile;
+		// Create the application trace file.
+		m_strTraceFile = CPath(CPath::ApplicationDir(), "SockTrace.log");
 
-		fSendFile.Create(m_strSendPath);
-		fSendFile.Close();
+		CFile fFile;
 
-		fRecvFile.Create(m_strRecvPath);
-		fRecvFile.Close();
+		fFile.Create(m_strTraceFile);
+		fFile.Close();
 	}
 	catch (CFileException& e)
 	{
-		AlertMsg("Failed to truncate log file:\n\n%s", e.ErrorText());
+		AlertMsg("Failed to truncate the log file:\n\n%s", e.ErrorText());
 		return false;
 	}
 
@@ -148,58 +139,79 @@ bool CSockTraceApp::OnOpen()
 		return false;
 	}
 
-	try
+	CBusyCursor oCursor;
+
+	// Resolve all destination hostnames...
+	for (int i = 0; i < m_aoConfigs.Size(); ++i)
 	{
-		CBusyCursor oCursor;
+		CSockConfig* pConfig = m_aoConfigs[i];
 
-		// If set, resolve the source hostname.
-		if ( (m_strSrcHost != "") && (!CSocket::IsAddress(m_strSrcHost)) )
+		try
 		{
-			in_addr addr = CSocket::Resolve(m_strSrcHost);
+			// Assume its an IP address.
+			pConfig->m_strDstAddr = pConfig->m_strDstHost;
 
-			Trace("Resolved source hostname: %s to %s", m_strSrcHost, inet_ntoa(addr));
+			// Needs resolving?
+			if (!CSocket::IsAddress(pConfig->m_strDstHost))
+			{
+				pConfig->m_strDstAddr = CSocket::ResolveStr(pConfig->m_strDstHost);
+
+				Trace("Resolved hostname %s to %s", pConfig->m_strDstHost, pConfig->m_strDstAddr);
+			}
 		}
-
-		// If set, resolve the destination hostname.
-		if ( (m_strDstHost != "") && (!CSocket::IsAddress(m_strDstHost)) )
+		catch (CSocketException& e)
 		{
-			in_addr addr = CSocket::Resolve(m_strDstHost);
-
-			Trace("Resolved destination hostname: %s to %s", m_strDstHost, inet_ntoa(addr));
-		}
-	}
-	catch (CSocketException& e)
-	{
-		AlertMsg("Failed to resolve hostname:\n\n%s", e.ErrorText());
-		return false;
-	}
-
-	try
-	{
-		Trace("Opening %s server socket on port: %d", m_strType, m_nSrcPort);
-
-		ASSERT(m_nSrcPort != m_nDstPort);
-
-		if (m_nType == SOCK_STREAM)
-		{
-			// Create the listening socket.
-			m_pTCPLstSock = new CTCPSvrSocket;
-			m_pTCPLstSock->Listen(m_nSrcPort, 1);
-		}
-		else
-		{
-			// Create both UDP server sockets.
-			m_pUDPInpSocket = new CUDPSvrSocket;
-			m_pUDPInpSocket->Listen(m_nSrcPort);
-
-			m_pUDPOutSocket = new CUDPSvrSocket; 
-			m_pUDPOutSocket->Listen(m_nDstPort);
+			Trace("Failed to resolve hostname %s - %s", pConfig->m_strDstHost, CWinSock::ErrorToSymbol(e.m_nWSACode));
 		}
 	}
-	catch (CSocketException& e)
+
+	// Create all server sockets.
+	for (i = 0; i < m_aoConfigs.Size(); ++i)
 	{
-		AlertMsg("Failed to create server socket:\n\n%s", e.ErrorText());
-		return false;
+		CSockConfig* pConfig = m_aoConfigs[i];
+
+		// TCP socket?
+		if (pConfig->m_nType == SOCK_STREAM)
+		{
+			// Create the TCP listening socket.
+			CTCPSvrSocket* pTCPSvrSock = new CTCPSvrSocket;
+
+			try
+			{
+				Trace("Opening TCP server socket on port %d", pConfig->m_nSrcPort);
+
+				// Start listening...
+				pTCPSvrSock->Listen(pConfig->m_nSrcPort, 5);
+
+				// Add to the collection.
+				m_aoTCPSvrSocks.Add(pTCPSvrSock);
+			}
+			catch (CSocketException& e)
+			{
+				Trace("Failed to create server socket on port %d - %s", pConfig->m_nSrcPort, e.ErrorText());
+
+				delete pTCPSvrSock;
+			}
+		}
+		// UDP socket?
+		else if (pConfig->m_nType == SOCK_DGRAM)
+		{
+			Trace("Opened UDP sockets on port %d connection %d ", pConfig->m_nSrcPort, m_nInstance);
+
+			// Create the listening sockets.
+			CUDPSockPair* pUDPSocks = new CUDPSockPair(m_nInstance++, pConfig);
+
+			// Parse destination IP address.
+			pUDPSocks->m_oDstAddr.s_addr = inet_addr(pConfig->m_strDstAddr);
+			pUDPSocks->m_nDstPort        = pConfig->m_nDstPort;
+
+			// Start listening...
+			pUDPSocks->m_oInpSocket.Listen(pConfig->m_nSrcPort);
+			pUDPSocks->m_oOutSocket.Listen(pConfig->m_nSrcPort+1);
+
+			// Add to the collection.
+			m_aoUDPSvrSocks.Add(pUDPSocks);
+		}
 	}
 
 	// Start the background timer.
@@ -223,11 +235,9 @@ bool CSockTraceApp::OnOpen()
 bool CSockTraceApp::OnClose()
 {
 	// Cleanup the sockets.
-	delete m_pTCPOutSocket;
-	delete m_pTCPInpSocket;
-	delete m_pTCPLstSock;
-	delete m_pUDPInpSocket;
-	delete m_pUDPOutSocket;
+	m_aoTCPSvrSocks.DeleteAll();
+	m_aoTCPCltSocks.DeleteAll();
+	m_aoUDPSvrSocks.DeleteAll();
 
 	// Stop the background timer.
 	StopTimer(m_nTimerID);
@@ -270,6 +280,24 @@ void CSockTraceApp::Trace(const char* pszMsg, ...)
 
 	// Send to trace window.	
 	m_AppWnd.m_AppDlg.Trace(strMsg);
+
+	try
+	{
+		CFile fLogFile;
+
+		// Open application log file.
+		if (m_strTraceFile.Exists())
+			fLogFile.Open(m_strTraceFile, GENERIC_WRITE);
+		else
+			fLogFile.Create(m_strTraceFile);
+
+		// Write trace message to application log file.
+		fLogFile.Seek(0, FILE_END);
+		fLogFile.WriteLine(strMsg);
+		fLogFile.Close();
+	}
+	catch (CFileException& /*e*/)
+	{ }
 }
 
 /******************************************************************************
@@ -324,19 +352,47 @@ void CSockTraceApp::LoadConfig()
 	// Read the file version.
 	CString strVer = m_oIniFile.ReadString("Version", "Version", INI_FILE_VER);
 
-	// Read the socket settings.
-	m_strType    = m_oIniFile.ReadString("Socket", "Type",     "TCP");
-	m_strSrcHost = m_oIniFile.ReadString("Socket", "SrcHost",  m_strSrcHost);
-	m_nSrcPort   = m_oIniFile.ReadInt   ("Socket", "SrcPort",  m_nSrcPort  );
-	m_strDstHost = m_oIniFile.ReadString("Socket", "DstHost",  m_strDstHost);
-	m_nDstPort   = m_oIniFile.ReadInt   ("Socket", "DstPort",  m_nDstPort  );
+	// Read the socket configurations.
+	int nConfigs = m_oIniFile.ReadInt("Sockets", "Count", 0);
 
-	// Get the WinSock socket type.
-	m_nType = (m_strType == "TCP") ? SOCK_STREAM : SOCK_DGRAM;
+	for (int i = 0; i < nConfigs; ++i)
+	{
+		CString strSection, strEntry;
 
-	// Read the log filenames.
-	m_strSendFile = m_oIniFile.ReadString("Logs", "Send",  DEF_SEND_FILE);
-	m_strRecvFile = m_oIniFile.ReadString("Logs", "Recv",  DEF_RECV_FILE);
+		strEntry.Format("Socket[%d]", i);
+
+		// Get the socket config section.
+		CString strPort = m_oIniFile.ReadString("Sockets", strEntry, "");
+
+		if (strPort.Empty())
+			continue;
+
+		// Format section name.
+		strSection.Format("Port %s", strPort);
+
+		CSockConfig* pConfig = new CSockConfig;
+
+		// Read the socket settings.
+		pConfig->m_strType    = m_oIniFile.ReadString(strSection, "Type",    "TCP"      );
+		pConfig->m_nSrcPort   = m_oIniFile.ReadInt   (strSection, "SrcPort", 80         );
+		pConfig->m_strDstHost = m_oIniFile.ReadString(strSection, "DstHost", "localhost");
+		pConfig->m_nDstPort   = m_oIniFile.ReadInt   (strSection, "DstPort", 80         );
+
+		// Get the WinSock socket type.
+		pConfig->m_nType = (pConfig->m_strType == "TCP") ? SOCK_STREAM : SOCK_DGRAM;
+
+		CString strDefSendFile, strDefRecvFile;
+
+		// Format the default log filenames.
+		strDefSendFile.Format("Send_%d_%%d", pConfig->m_nSrcPort);
+		strDefRecvFile.Format("Recv_%d_%%d", pConfig->m_nSrcPort);
+
+		// Read the log filenames.
+		pConfig->m_strSendFile = m_oIniFile.ReadString(strSection, "Send", strDefSendFile);
+		pConfig->m_strRecvFile = m_oIniFile.ReadString(strSection, "Recv", strDefRecvFile);
+
+		m_aoConfigs.Add(pConfig);
+	}
 
 	// Read the window pos and size.
 	m_rcLastPos.left   = m_oIniFile.ReadInt("UI", "Left",   0);
@@ -363,19 +419,39 @@ void CSockTraceApp::SaveConfig()
 	m_oIniFile.WriteString("Version", "Version", INI_FILE_VER);
 
 	// Write the socket settings.
-	m_oIniFile.WriteInt   ("Socket", "SrcPort", m_nSrcPort  );
-	m_oIniFile.WriteString("Socket", "DstHost", m_strDstHost);
-	m_oIniFile.WriteInt   ("Socket", "DstPort", m_nDstPort  );
-
-	// Write the log filenames.
-	m_oIniFile.ReadString("Logs", "Send",  m_strSendFile);
-	m_oIniFile.ReadString("Logs", "Recv",  m_strRecvFile);
 
 	// Write the window pos and size.
 	m_oIniFile.WriteInt("UI", "Left",   m_rcLastPos.left  );
 	m_oIniFile.WriteInt("UI", "Top",    m_rcLastPos.top   );
 	m_oIniFile.WriteInt("UI", "Right",  m_rcLastPos.right );
 	m_oIniFile.WriteInt("UI", "Bottom", m_rcLastPos.bottom);
+}
+
+/******************************************************************************
+** Method:		FindConfig()
+**
+** Description:	Find a socket config.
+**
+** Parameters:	nType	The socket type.
+**				nPort	The port number.
+**
+** Returns:		The config or NULL.
+**
+*******************************************************************************
+*/
+
+CSockConfig* CSockTraceApp::FindConfig(int nType, uint nPort) const
+{
+	// For all configs...
+	for (int i = 0; i < m_aoConfigs.Size(); ++i)
+	{
+		CSockConfig* pConfig = m_aoConfigs[i];
+
+		if ( (pConfig->m_nType == nType) && (pConfig->m_nSrcPort == nPort) )
+			return pConfig;
+	}
+
+	return NULL;
 }
 
 /******************************************************************************
@@ -391,31 +467,25 @@ void CSockTraceApp::SaveConfig()
 *******************************************************************************
 */
 
-void CSockTraceApp::OnTimer(uint nTimerID)
+void CSockTraceApp::OnTimer(uint /*nTimerID*/)
 {
 	try
 	{
-		ASSERT(nTimerID == m_nTimerID);
-
 		// Process TCP client connections.
-		if (m_nType == SOCK_STREAM)
-			HandleConnects();
+		HandleTCPConnects();
 
 		// Process data transfer.
-		if (m_nType == SOCK_STREAM)
-			HandleTCPPackets();
-		else
-			HandleUDPPackets();
+		HandleTCPPackets();
+		HandleUDPPackets();
 
 		// Process TCP client disconnections.
-		if (m_nType == SOCK_STREAM)
-			HandleDisconnects();
+		HandleTCPDisconnects();
 	}
 	catch (CSocketException& e)
 	{
 		StopTimer(m_nTimerID);
 
-		FatalMsg("Failed to link client and server: %s", e.ErrorText());
+		FatalMsg("Failed to link client and server - %s", e.ErrorText());
 
 		m_AppWnd.Close();
 	}
@@ -423,7 +493,7 @@ void CSockTraceApp::OnTimer(uint nTimerID)
 	{
 		StopTimer(m_nTimerID);
 
-		FatalMsg("Failed to log socket data: %s", e.ErrorText());
+		FatalMsg("Failed to log socket data - %s", e.ErrorText());
 
 		m_AppWnd.Close();
 	}
@@ -438,9 +508,9 @@ void CSockTraceApp::OnTimer(uint nTimerID)
 }
 
 /******************************************************************************
-** Method:		HandleConnects()
+** Method:		HandleTCPConnects()
 **
-** Description:	Check for a client connecting to the server.
+** Description:	Check for TCP clients connecting to the server.
 **
 ** Parameters:	None.
 **
@@ -451,27 +521,44 @@ void CSockTraceApp::OnTimer(uint nTimerID)
 *******************************************************************************
 */
 
-void CSockTraceApp::HandleConnects()
+void CSockTraceApp::HandleTCPConnects()
 {
-	ASSERT(m_pTCPLstSock != NULL);
-
-	// No connection and one waiting?
-	if ( (m_pTCPInpSocket == NULL) && (m_pTCPLstSock->CanAccept()) )
+	for (int i = 0; i < m_aoTCPSvrSocks.Size(); ++i)
 	{
-		// Accept the connection.
-		m_pTCPInpSocket = m_pTCPLstSock->Accept();
+		CTCPSvrSocket* pSvrSocket = m_aoTCPSvrSocks[i];
 
-		ASSERT(m_pTCPInpSocket != NULL);
+		try
+		{
+			// Connection waiting?
+			if (pSvrSocket->CanAccept())
+			{
+				// Accept the connection.
+				CTCPCltSocket* pInpSocket = pSvrSocket->Accept();
 
-		Trace("Connection accepted from: %s", m_pTCPInpSocket->PeerAddress());
+				ASSERT(pInpSocket != NULL);
 
-		ASSERT(m_pTCPOutSocket == NULL);
+				Trace("Connection accepted from %s", pInpSocket->Host());
 
-		// Open socket to destination.
-		m_pTCPOutSocket = new CTCPCltSocket();
-		m_pTCPOutSocket->Connect(m_strDstHost, m_nDstPort);
+				// Find the config for the server socket.
+				CSockConfig* pConfig = FindConfig(pSvrSocket->Type(), pSvrSocket->Port());
 
-		Trace("Opened connection to server: %s", m_strSrcHost);
+				ASSERT(pConfig != NULL);
+
+				// Create socket to destination.
+				CTCPCltSocket* pOutSocket = new CTCPCltSocket();
+
+				pOutSocket->Connect(pConfig->m_strDstHost, pConfig->m_nDstPort);
+
+				Trace("Opened TCP connection %d to server %s:%d", m_nInstance, pOutSocket->Host(), pOutSocket->Port());
+
+				// Add socket pair to collection.
+				m_aoTCPCltSocks.Add(new CTCPSockPair(m_nInstance++, pConfig, pInpSocket, pOutSocket));
+			}
+		}
+		catch (CSocketException& e)
+		{
+			Trace("Failed to accept client connection on port %d  - %s", pSvrSocket->Port(), e.ErrorText());
+		}
 	}
 }
 
@@ -490,59 +577,61 @@ void CSockTraceApp::HandleConnects()
 
 void CSockTraceApp::HandleTCPPackets()
 {
-	// No connection?
-	if ( (m_pTCPInpSocket == NULL) || (m_pTCPOutSocket == NULL) )
-		return;
-
-	try
+	// For all TCP proxies...
+	for (int i = 0; i < m_aoTCPCltSocks.Size(); ++i)
 	{
-		int nAvail, nRead;
+		CTCPSockPair* pSockPair = m_aoTCPCltSocks[i];
 
-		// Check client side socket.
-		if ((nAvail = m_pTCPInpSocket->Available()) > 0)
+		try
 		{
-			CBuffer oBuffer(nAvail);
+			int nAvail, nRead;
 
-			// Read data from the client socket.
-			if ((nRead = m_pTCPInpSocket->Recv(oBuffer)) > 0)
+			// Check client side socket.
+			if ((nAvail = pSockPair->m_pInpSocket->Available()) > 0)
 			{
-				Trace("Forwarded %d bytes to the server", nRead);
+				CBuffer oBuffer(nAvail);
 
-				// Send down the server socket.
-				m_pTCPOutSocket->Send(oBuffer.Buffer(), nRead);
+				// Read data from the client socket.
+				if ((nRead = pSockPair->m_pInpSocket->Recv(oBuffer)) > 0)
+				{
+					Trace("Forwarded %d bytes to the server on connection %d", nRead, pSockPair->m_nInstance);
 
-				// Log the data sent by the client.
-				LogData(m_strSendPath, oBuffer.Buffer(), nRead);
+					// Send down the server socket.
+					pSockPair->m_pOutSocket->Send(oBuffer.Buffer(), nRead);
+
+					// Log the data sent by the client.
+					LogData(pSockPair->m_strSendFile, oBuffer.Buffer(), nRead);
+				}
+			}
+
+			// Check server side socket.
+			if ((nAvail = pSockPair->m_pOutSocket->Available()) > 0)
+			{
+				CBuffer oBuffer(nAvail);
+
+				// Read data from the server socket.
+				if ((nRead = pSockPair->m_pOutSocket->Recv(oBuffer)) > 0)
+				{
+					Trace("Forwarded %d bytes to the client on connection %d", nRead, pSockPair->m_nInstance);
+
+					// Send down the client socket.
+					pSockPair->m_pInpSocket->Send(oBuffer.Buffer(), nRead);
+
+					// Log the data received by the client.
+					LogData(pSockPair->m_strRecvFile, oBuffer.Buffer(), nRead);
+				}
 			}
 		}
-
-		// Check server side socket.
-		if ((nAvail = m_pTCPOutSocket->Available()) > 0)
+		catch (CSocketException& e)
 		{
-			CBuffer oBuffer(nAvail);
+			if (e.ErrorCode() == CSocketException::E_DISCONNECTED)
+				Trace("Connection %d closed on port %d", pSockPair->m_nInstance, pSockPair->m_pConfig->m_nSrcPort);
+			else
+				Trace("Failed to forward packets on connection %d - %s", pSockPair->m_nInstance, e.ErrorText());
 
-			// Read data from the server socket.
-			if ((nRead = m_pTCPOutSocket->Recv(oBuffer)) > 0)
-			{
-				Trace("Forwarded %d bytes to the client", nRead);
-
-				// Send down the client socket.
-				m_pTCPInpSocket->Send(oBuffer.Buffer(), nRead);
-
-				// Log the data received by the client.
-				LogData(m_strRecvPath, oBuffer.Buffer(), nRead);
-			}
+			pSockPair->m_pInpSocket->Close();
+			pSockPair->m_pOutSocket->Close();
 		}
-	}
-	catch (CSocketException& e)
-	{
-		if (e.ErrorCode() == CSocketException::E_DISCONNECTED)
-			Trace("Connection closed");
-		else
-			Trace("Failed to forward packets: %s", e.ErrorText());
-
-		m_pTCPInpSocket->Close();
-		m_pTCPOutSocket->Close();
 	}
 }
 
@@ -561,59 +650,64 @@ void CSockTraceApp::HandleTCPPackets()
 
 void CSockTraceApp::HandleUDPPackets()
 {
-	ASSERT((m_pUDPInpSocket != NULL) && (m_pUDPOutSocket != NULL));
-
-	try
+	// For all UDP proxies...
+	for (int i = 0; i < m_aoUDPSvrSocks.Size(); ++i)
 	{
-		int     nAvail, nRead, nPort;
-		in_addr oAddr;
+		CUDPSockPair* pSockPair = m_aoUDPSvrSocks[i];
 
-		// Check client side socket.
-		if ((nAvail = m_pUDPInpSocket->Available()) > 0)
+		try
 		{
-			CBuffer oBuffer(nAvail);
+			int nAvail, nRead;
 
-			// Read data from the client socket.
-			if ((nRead = m_pUDPInpSocket->RecvFrom(oBuffer, oAddr, nPort)) > 0)
+			// Check client side socket.
+			if ((nAvail = pSockPair->m_oInpSocket.Available()) > 0)
 			{
-				Trace("Forwarded %d bytes to the server", nRead);
+				CBuffer oBuffer(nAvail);
 
-				// Send down the server socket.
-//				m_pTCPOutSocket->Send(oBuffer.Buffer(), nRead);
+				// Read data from the client socket.
+				if ((nRead = pSockPair->m_oInpSocket.RecvFrom(oBuffer, pSockPair->m_oSrcAddr, pSockPair->m_nSrcPort)) > 0)
+				{
+					Trace("Forwarded %d bytes to the server (%s:%d)", nRead, inet_ntoa(pSockPair->m_oSrcAddr), pSockPair->m_nSrcPort);
 
-				// Log the data sent by the client.
-				LogData(m_strSendPath, oBuffer.Buffer(), nRead);
+					// Send down the server socket.
+					pSockPair->m_oOutSocket.SendTo(oBuffer.Buffer(), nRead, pSockPair->m_oDstAddr, pSockPair->m_nDstPort);
+
+					// Log the data sent by the client.
+					LogData(pSockPair->m_strSendFile, oBuffer.Buffer(), nRead);
+				}
+			}
+
+			// Check server side socket.
+			if ((nAvail = pSockPair->m_oOutSocket.Available()) > 0)
+			{
+				CBuffer oBuffer(nAvail);
+				in_addr oAddress;
+				uint    nPort;
+
+				// Read data from the server socket.
+				if ((nRead = pSockPair->m_oOutSocket.RecvFrom(oBuffer, oAddress, nPort)) > 0)
+				{
+					Trace("Forwarded %d bytes to the client (%s:%d)", nRead, inet_ntoa(oAddress), nPort);
+
+					// Send down the client socket.
+					pSockPair->m_oInpSocket.SendTo(oBuffer.Buffer(), nRead, pSockPair->m_oSrcAddr, pSockPair->m_nSrcPort);
+
+					// Log the data received by the client.
+					LogData(pSockPair->m_strRecvFile, oBuffer.Buffer(), nRead);
+				}
 			}
 		}
-
-		// Check server side socket.
-		if ((nAvail = m_pUDPOutSocket->Available()) > 0)
+		catch (CSocketException& e)
 		{
-			CBuffer oBuffer(nAvail);
-
-			// Read data from the server socket.
-			if ((nRead = m_pUDPOutSocket->RecvFrom(oBuffer, oAddr, nPort)) > 0)
-			{
-				Trace("Forwarded %d bytes to the client", nRead);
-
-				// Send down the client socket.
-//				m_pTCPInpSocket->Send(oBuffer.Buffer(), nRead);
-
-				// Log the data received by the client.
-				LogData(m_strRecvPath, oBuffer.Buffer(), nRead);
-			}
+			Trace("Failed to forward packets on connection %d - %s", pSockPair->m_nInstance, e.ErrorText());
 		}
-	}
-	catch (CSocketException& e)
-	{
-		Trace("Failed to forward packets: %s", e.ErrorText());
 	}
 }
 
 /******************************************************************************
-** Method:		HandleDisconnects()
+** Method:		HandleTCPDisconnects()
 **
-** Description:	Cleanup if either the client or server sockets have been closed.
+** Description:	Check for TCP clients or servers closing the connection.
 **
 ** Parameters:	None.
 **
@@ -622,23 +716,15 @@ void CSockTraceApp::HandleUDPPackets()
 *******************************************************************************
 */
 
-void CSockTraceApp::HandleDisconnects()
+void CSockTraceApp::HandleTCPDisconnects()
 {
-	ASSERT(m_pTCPLstSock != NULL);
-
-	// No connection?
-	if ( (m_pTCPInpSocket == NULL) || (m_pTCPOutSocket == NULL) )
-		return;
-	
-	// Either socket closed?
-	if ( (!m_pTCPInpSocket->IsOpen()) || (!m_pTCPOutSocket->IsOpen()) )
+	// For all TCP proxy connections...
+	for (int i = m_aoTCPCltSocks.Size()-1; i >= 0; --i)
 	{
-		// Free connection.
-		delete m_pTCPInpSocket;
-		delete m_pTCPOutSocket;
+		CTCPSockPair* pSockPair = m_aoTCPCltSocks[i];
 
-		// Reset members.
-		m_pTCPInpSocket  = NULL;
-		m_pTCPOutSocket = NULL;
+		// Cleanup, if either socket was closed.
+		if ( (!pSockPair->m_pInpSocket->IsOpen()) || (!pSockPair->m_pOutSocket->IsOpen()) )
+			m_aoTCPCltSocks.Delete(i);
 	}
 }
