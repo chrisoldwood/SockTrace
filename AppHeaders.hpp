@@ -32,6 +32,9 @@
 #include "Resource.h"
 
 // App data classes.
+#include "SockConfig.hpp"
+#include "TCPSockPair.hpp"
+#include "UDPSockPair.hpp"
 
 // App GUI classes.
 #include "AppCmds.hpp"
