@@ -389,6 +389,9 @@
 						BrowseInformation="1"/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath=".\TraceOptsDlg.cpp">
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -434,6 +437,9 @@
 			</File>
 			<File
 				RelativePath="TCPSockPair.hpp">
+			</File>
+			<File
+				RelativePath=".\TraceOptsDlg.hpp">
 			</File>
 			<File
 				RelativePath="UDPSockPair.hpp">
