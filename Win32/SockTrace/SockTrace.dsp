@@ -94,10 +94,6 @@ SOURCE=.\AboutDlg.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\App.rc
-# End Source File
-# Begin Source File
-
 SOURCE=.\AppCmds.cpp
 # End Source File
 # Begin Source File
@@ -123,6 +119,10 @@ SOURCE=.\SockOptsDlg.cpp
 # Begin Source File
 
 SOURCE=.\SockPair.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\SockTrace.rc
 # End Source File
 # Begin Source File
 
