@@ -35,6 +35,8 @@ CAppCmds::CAppCmds()
 	DEFINE_CMD_TABLE
 		// File menu.
 		CMD_ENTRY(ID_FILE_EXIT,			OnFileExit,			NULL,				-1)
+		// View menu.
+		CMD_ENTRY(ID_VIEW_CLEAR_TRACE,	OnViewClearTrace,	NULL,				-1)
 		// Options menu.
 		CMD_ENTRY(ID_OPTIONS_SOCKET,	OnOptionsSocket,	NULL,				-1)
 		// Help menu.
@@ -76,6 +78,23 @@ void CAppCmds::OnFileExit()
 }
 
 /******************************************************************************
+** Method:		OnViewClearTrace()
+**
+** Description:	Clear the trace window.
+**
+** Parameters:	None.
+**
+** Returns:		Nothing.
+**
+*******************************************************************************
+*/
+
+void CAppCmds::OnViewClearTrace()
+{
+	App.m_AppWnd.m_AppDlg.Clear();
+}
+
+/******************************************************************************
 ** Method:		OnOptionsSocket()
 **
 ** Description:	Configure the socket settings.
@@ -91,8 +110,21 @@ void CAppCmds::OnOptionsSocket()
 {
 	CSockOptsDlg Dlg;
 
-	if (Dlg.RunModal(App.m_rMainWnd) == IDOK)
+	Dlg.m_aoConfigs.DeepCopy(App.m_aoConfigs);
+
+	// Show sockets config dialog.
+	if ( (Dlg.RunModal(App.m_rMainWnd) == IDOK) && (Dlg.m_bModified) )
 	{
+		// Close all current sockets.
+		App.CloseSockets();
+
+		App.m_aoConfigs.DeleteAll();
+		App.m_aoConfigs.DeepCopy(Dlg.m_aoConfigs);
+
+		App.m_bCfgModified = true;
+
+		// Start listening again...
+		App.OpenSockets();
 	}
 }
 
