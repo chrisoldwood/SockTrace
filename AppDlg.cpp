@@ -95,6 +95,10 @@ void CAppDlg::Trace(const char* pszMsg)
 	if (m_lbTrace.CurSel() == (i-1))
 		m_lbTrace.CurSel(i);
 
+	// Delete expired trace lines.
+	while (m_lbTrace.Count() > App.m_nTraceLines)
+		m_lbTrace.Delete(0);
+
 	m_lbTrace.Redraw(true);
 	m_lbTrace.Invalidate();
 }
