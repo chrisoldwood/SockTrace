@@ -35,6 +35,11 @@ public:
 	CFrameMenu	m_Menu;
 	CStatusBar	m_StatusBar;
 
+	//
+	// Constants.
+	//
+	static const char* WNDCLASS_NAME;
+
 protected:
 	//
 	// Internal members.
@@ -47,6 +52,12 @@ protected:
 		IDC_TOOL_BAR   = 100,
 		IDC_STATUS_BAR = 101
 	};
+
+	//
+	// Window creation template methods.
+	//
+	virtual void GetClassParams(WNDCLASS& rParams);
+	virtual void GetCreateParams(WNDCREATE& rParams);
 
 	//
 	// Message processors.
