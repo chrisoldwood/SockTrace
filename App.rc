@@ -74,9 +74,13 @@ BEGIN
     BEGIN
         MENUITEM "E&xit\tAlt+F4",               ID_FILE_EXIT
     END
+    POPUP "&View"
+    BEGIN
+        MENUITEM "&Clear Trace",                ID_VIEW_CLEAR_TRACE
+    END
     POPUP "&Options"
     BEGIN
-        MENUITEM "&Socket...",                  ID_OPTIONS_SOCKET
+        MENUITEM "&Sockets...",                 ID_OPTIONS_SOCKET
     END
     POPUP "&Help"
     BEGIN
@@ -118,13 +122,42 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,35,100,50,15
 END
 
-IDD_SOCK_OPTIONS DIALOG DISCARDABLE  0, 0, 186, 95
+IDD_SOCK_OPTIONS DIALOGEX 0, 0, 327, 135
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Socket Settings"
 FONT 8, "MS Sans Serif"
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,30,70,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,95,70,50,14
+    CONTROL         "List1",IDC_SOCKETS,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_NOSORTHEADER | 
+                    WS_BORDER | WS_TABSTOP,10,10,305,95,WS_EX_CLIENTEDGE
+    PUSHBUTTON      "&Add...",IDC_ADD,10,110,50,14
+    PUSHBUTTON      "&Edit...",IDC_EDIT,65,110,50,14
+    PUSHBUTTON      "&Remove",IDC_REMOVE,120,110,50,14
+    DEFPUSHBUTTON   "OK",IDOK,210,110,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,265,110,50,14
+END
+
+IDD_SOCK_CONFIG DIALOG DISCARDABLE  0, 0, 247, 162
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Socket Configuration"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "Protocol:",IDC_STATIC,10,12,60,8
+    COMBOBOX        IDC_PROTOCOL,70,10,50,50,CBS_DROPDOWNLIST | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Source Port:",IDC_STATIC,10,33,60,8
+    EDITTEXT        IDC_SRC_PORT,70,30,50,14,ES_AUTOHSCROLL
+    LTEXT           "Destination Host:",IDC_STATIC,10,53,60,8
+    EDITTEXT        IDC_DST_HOST,70,50,125,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "&Check",IDC_CHECK,195,50,40,14
+    LTEXT           "Destination Port:",IDC_STATIC,10,73,60,8
+    EDITTEXT        IDC_DST_PORT,70,70,50,14,ES_AUTOHSCROLL
+    LTEXT           "Send File:",IDC_STATIC,10,93,60,8
+    EDITTEXT        IDC_SEND_FILE,70,90,125,14,ES_AUTOHSCROLL
+    LTEXT           "Receive File:",IDC_STATIC,10,113,60,8
+    EDITTEXT        IDC_RECV_FILE,70,110,125,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,75,135,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,130,135,50,14
 END
 
 
@@ -155,9 +188,17 @@ BEGIN
     IDD_SOCK_OPTIONS, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 179
+        RIGHTMARGIN, 320
         TOPMARGIN, 7
-        BOTTOMMARGIN, 88
+        BOTTOMMARGIN, 128
+    END
+
+    IDD_SOCK_CONFIG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 240
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 155
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -219,7 +260,13 @@ END
 STRINGTABLE DISCARDABLE 
 BEGIN
     ID_OPTIONS_POPUP        "Settings"
-    ID_OPTIONS_SOCKET       "Configure the socket settings"
+    ID_OPTIONS_SOCKET       "Configure the sockets to trace"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_VIEW_POPUP           "View options"
+    ID_VIEW_CLEAR_TRACE     "Clear the trace window"
 END
 
 #endif    // English (U.K.) resources
