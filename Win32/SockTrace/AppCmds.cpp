@@ -9,6 +9,7 @@
 */
 
 #include "AppHeaders.hpp"
+#include "ConnsDlg.hpp"
 #include "SockOptsDlg.hpp"
 #include "AboutDlg.hpp"
 
@@ -34,15 +35,16 @@ CAppCmds::CAppCmds()
 	// Define the command table.
 	DEFINE_CMD_TABLE
 		// File menu.
-		CMD_ENTRY(ID_FILE_EXIT,			OnFileExit,			NULL,				-1)
+		CMD_ENTRY(ID_FILE_EXIT,			OnFileExit,			NULL,	-1)
 		// View menu.
-		CMD_ENTRY(ID_VIEW_CLEAR_TRACE,	OnViewClearTrace,	NULL,				-1)
+		CMD_ENTRY(ID_VIEW_CONNS,		OnViewConnections,	NULL,	-1)
+		CMD_ENTRY(ID_VIEW_CLEAR_TRACE,	OnViewClearTrace,	NULL,	-1)
 		// Tools menu.
-		CMD_ENTRY(ID_TOOLS_HOSTS,		OnToolsEditHosts,	NULL,				-1)
+		CMD_ENTRY(ID_TOOLS_HOSTS,		OnToolsEditHosts,	NULL,	-1)
 		// Options menu.
-		CMD_ENTRY(ID_OPTIONS_SOCKET,	OnOptionsSocket,	NULL,				-1)
+		CMD_ENTRY(ID_OPTIONS_SOCKET,	OnOptionsSocket,	NULL,	-1)
 		// Help menu.
-		CMD_ENTRY(ID_HELP_ABOUT,		OnHelpAbout,		NULL,				10)
+		CMD_ENTRY(ID_HELP_ABOUT,		OnHelpAbout,		NULL,	10)
 	END_CMD_TABLE
 }
 
@@ -77,6 +79,25 @@ CAppCmds::~CAppCmds()
 void CAppCmds::OnFileExit()
 {
 	App.m_AppWnd.Close();
+}
+
+/******************************************************************************
+** Method:		OnViewConnections()
+**
+** Description:	View the list of open sockets.
+**
+** Parameters:	None.
+**
+** Returns:		Nothing.
+**
+*******************************************************************************
+*/
+
+void CAppCmds::OnViewConnections()
+{
+	CConnsDlg Dlg;
+
+	Dlg.RunModal(App.m_rMainWnd);
 }
 
 /******************************************************************************
@@ -139,6 +160,25 @@ void CAppCmds::OnToolsEditHosts()
 
 void CAppCmds::OnOptionsSocket()
 {
+	bool bOpen = false;
+
+	// Check if there are any open connections.
+	for (int i = 0; i < App.m_aoTCPCltSocks.Size(); ++i)
+	{
+		CTCPSockPair* pPair = App.m_aoTCPCltSocks[i];
+
+		if (pPair->m_pInpSocket->IsOpen() && pPair->m_pOutSocket->IsOpen())
+			bOpen = true;
+	}
+
+	const char* pszMsg = "WARNING: There are open connections.\n"
+						 "Any changes will cause these to be dropped.\n\n"
+						 "Do you want to continue?";
+
+	// Query user to continue.
+	if ( (bOpen) && (App.QueryMsg(pszMsg) != IDYES) )
+		return;
+
 	CSockOptsDlg Dlg;
 
 	Dlg.m_aoConfigs.DeepCopy(App.m_aoConfigs);
