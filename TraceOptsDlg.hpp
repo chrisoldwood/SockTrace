@@ -1,63 +1,48 @@
 /******************************************************************************
 ** (C) Chris Oldwood
 **
-** MODULE:		APPCMDS.HPP
-** COMPONENT:	The Application.
-** DESCRIPTION:	The CAppCmds class declaration.
+** MODULE:		TRACEOPTSDLG.HPP
+** COMPONENT:	The Application
+** DESCRIPTION:	The CTraceOptsDlg class declaration.
 **
 *******************************************************************************
 */
 
 // Check for previous inclusion
-#ifndef APPCMDS_HPP
-#define APPCMDS_HPP
+#ifndef TRACEOPTSDLG_HPP
+#define TRACEOPTSDLG_HPP
 
 /******************************************************************************
 ** 
-** Application command controller.
+** .
 **
 *******************************************************************************
 */
 
-class CAppCmds : public CCmdControl
+class CTraceOptsDlg : public CDialog
 {
 public:
 	//
 	// Constructors/Destructor.
 	//
-	CAppCmds();
-	~CAppCmds();
-
-	//
-	// Commands.
-	//
-
-	// File menu.
-	void OnFileExit();
-
-	// View menu.
-	void OnViewConnections();
-	void OnViewClearTrace();
-
-	// Tools menu.
-	void OnToolsEditHosts();
-
-	// Options menu.
-	void OnOptionsGeneral();
-	void OnOptionsTrace();
-	void OnOptionsSocket();
-
-	// Help menu.
-	void OnHelpAbout();
-
-	//
-	// UI handlers.
-	//
-
+	CTraceOptsDlg();
+	
 protected:
 	//
-	// Internal methods.
+	// Controls.
 	//
+	CCheckBox	m_ckTraceConns;
+	CCheckBox	m_ckTraceData;
+	CCheckBox	m_ckTraceToWindow;
+	CEditBox	m_ebTraceLines;
+	CCheckBox	m_ckTraceToFile;
+	CEditBox	m_ebTraceFile;
+
+	//
+	// Message handlers.
+	//
+	virtual void OnInitDialog();
+	virtual bool OnOk();
 };
 
 /******************************************************************************
@@ -67,4 +52,4 @@ protected:
 *******************************************************************************
 */
 
-#endif //APPCMDS_HPP
+#endif // TRACEOPTSDLG_HPP
