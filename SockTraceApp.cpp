@@ -211,7 +211,7 @@ void CSockTraceApp::OpenSockets()
 	}
 
 	// Create all server sockets.
-	for (i = 0; i < m_aoConfigs.Size(); ++i)
+	for (int i = 0; i < m_aoConfigs.Size(); ++i)
 	{
 		CSockConfig* pConfig = m_aoConfigs[i];
 
