@@ -57,6 +57,7 @@ CSockTraceApp::CSockTraceApp()
 	: CApp(m_AppWnd, m_AppCmds)
 	, m_nTimerID(0)
 	, m_nInstance(1)
+	, m_bCfgModified(false)
 {
 }
 
@@ -139,6 +140,52 @@ bool CSockTraceApp::OnOpen()
 		return false;
 	}
 
+	// Start listening...
+	OpenSockets();
+
+	return true;
+}
+
+/******************************************************************************
+** Method:		OnClose()
+**
+** Description:	Cleans up the application resources.
+**
+** Parameters:	None.
+**
+** Returns:		true or false.
+**
+*******************************************************************************
+*/
+
+bool CSockTraceApp::OnClose()
+{
+	// Stop listening...
+	CloseSockets();
+
+	// Terminate WinSock.
+	CWinSock::Cleanup();
+
+	// Save settings.
+	SaveConfig();
+
+	return true;
+}
+
+/******************************************************************************
+** Method:		OpenSockets()
+**
+** Description:	Opens all server side sockets.
+**
+** Parameters:	None.
+**
+** Returns:		Nothing.
+**
+*******************************************************************************
+*/
+
+void CSockTraceApp::OpenSockets()
+{
 	CBusyCursor oCursor;
 
 	// Resolve all destination hostnames...
@@ -199,7 +246,7 @@ bool CSockTraceApp::OnOpen()
 			Trace("Opened UDP sockets on port %d connection %d ", pConfig->m_nSrcPort, m_nInstance);
 
 			// Create the listening sockets.
-			CUDPSockPair* pUDPSocks = new CUDPSockPair(m_nInstance++, pConfig);
+			CUDPSockPair* pUDPSocks = new CUDPSockPair(pConfig, m_nInstance++);
 
 			// Parse destination IP address.
 			pUDPSocks->m_oDstAddr.s_addr = inet_addr(pConfig->m_strDstAddr);
@@ -216,39 +263,29 @@ bool CSockTraceApp::OnOpen()
 
 	// Start the background timer.
 	m_nTimerID = StartTimer(BG_TIMER_FREQ);
-
-	return true;
 }
 
 /******************************************************************************
-** Method:		OnClose()
+** Method:		CloseSockets()
 **
-** Description:	Cleans up the application resources.
+** Description:	Close all client and server side sockets.
 **
 ** Parameters:	None.
 **
-** Returns:		true or false.
+** Returns:		Nothing.
 **
 *******************************************************************************
 */
 
-bool CSockTraceApp::OnClose()
+void CSockTraceApp::CloseSockets()
 {
+	// Stop the background timer.
+	StopTimer(m_nTimerID);
+
 	// Cleanup the sockets.
 	m_aoTCPSvrSocks.DeleteAll();
 	m_aoTCPCltSocks.DeleteAll();
 	m_aoUDPSvrSocks.DeleteAll();
-
-	// Stop the background timer.
-	StopTimer(m_nTimerID);
-
-	// Terminate WinSock.
-	CWinSock::Cleanup();
-
-	// Save settings.
-	SaveConfig();
-
-	return true;
 }
 
 /******************************************************************************
@@ -419,6 +456,36 @@ void CSockTraceApp::SaveConfig()
 	m_oIniFile.WriteString("Version", "Version", INI_FILE_VER);
 
 	// Write the socket settings.
+	if (m_bCfgModified)
+	{
+		m_oIniFile.WriteInt("Sockets", "Count", m_aoConfigs.Size());
+
+		for (int i = 0; i < m_aoConfigs.Size(); ++i)
+		{
+			CString strSection, strEntry, strValue;
+
+			CSockConfig* pConfig = m_aoConfigs[i];
+		
+			strEntry.Format("Socket[%d]", i);
+			strValue.Format("%d", pConfig->m_nSrcPort);
+
+			// Write the socket config section.
+			m_oIniFile.WriteString("Sockets", strEntry, strValue);
+
+			// Format section name.
+			strSection.Format("Port %s", strValue);
+
+			// Write the socket settings.
+			m_oIniFile.WriteString(strSection, "Type",    pConfig->m_strType   );
+			m_oIniFile.WriteInt   (strSection, "SrcPort", pConfig->m_nSrcPort  );
+			m_oIniFile.WriteString(strSection, "DstHost", pConfig->m_strDstHost);
+			m_oIniFile.WriteInt   (strSection, "DstPort", pConfig->m_nDstPort  );
+
+			// Read the log filenames.
+			m_oIniFile.WriteString(strSection, "Send", pConfig->m_strSendFile);
+			m_oIniFile.WriteString(strSection, "Recv", pConfig->m_strRecvFile);
+		}
+	}
 
 	// Write the window pos and size.
 	m_oIniFile.WriteInt("UI", "Left",   m_rcLastPos.left  );
@@ -552,7 +619,7 @@ void CSockTraceApp::HandleTCPConnects()
 				Trace("Opened TCP connection %d to server %s:%d", m_nInstance, pOutSocket->Host(), pOutSocket->Port());
 
 				// Add socket pair to collection.
-				m_aoTCPCltSocks.Add(new CTCPSockPair(m_nInstance++, pConfig, pInpSocket, pOutSocket));
+				m_aoTCPCltSocks.Add(new CTCPSockPair(pConfig, m_nInstance++, pInpSocket, pOutSocket));
 			}
 		}
 		catch (CSocketException& e)
