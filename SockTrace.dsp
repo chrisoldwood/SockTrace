@@ -203,6 +203,14 @@ SOURCE=.\App.rcv
 # End Group
 # Begin Source File
 
+SOURCE=.\ReadMe.txt
+# End Source File
+# Begin Source File
+
+SOURCE=.\RelNotes.txt
+# End Source File
+# Begin Source File
+
 SOURCE=.\TODO.txt
 # End Source File
 # End Target
