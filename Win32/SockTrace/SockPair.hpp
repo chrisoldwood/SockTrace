@@ -35,6 +35,8 @@ public:
 	CSockConfig*	m_pConfig;		// The socket config.
 	CPath			m_strSendFile;	// Path of log file for data sent.
 	CPath			m_strRecvFile;	// Path of log file for data recieved.
+	uint			m_nBytesSent;	// Total bytes sent.
+	uint			m_nBytesRecv;	// Total bytes recieved.
 
 private:
 	//

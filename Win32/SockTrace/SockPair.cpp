@@ -30,6 +30,8 @@
 CSockPair::CSockPair(CSockConfig* pConfig, uint nInstance)
 	: m_pConfig(pConfig)
 	, m_nInstance(nInstance)
+	, m_nBytesSent(0)
+	, m_nBytesRecv(0)
 {
 	ASSERT(pConfig != NULL);
 
