@@ -33,12 +33,21 @@ CSockTraceApp App;
 */
 
 #ifdef _DEBUG
-const char* CSockTraceApp::VERSION      = "v1.5 [Debug]";
+const char* CSockTraceApp::VERSION      = "v1.6 Beta [Debug]";
 #else
-const char* CSockTraceApp::VERSION      = "v1.5";
+const char* CSockTraceApp::VERSION      = "v1.6 Beta";
 #endif
 
 const char* CSockTraceApp::INI_FILE_VER  = "1.0";
+
+const bool  CSockTraceApp::DEF_TRAY_ICON       = false;
+const bool  CSockTraceApp::DEF_MIN_TO_TRAY     = false;
+const bool  CSockTraceApp::DEF_TRACE_CONNS     = true;
+const bool  CSockTraceApp::DEF_TRACE_DATA      = false;
+const bool  CSockTraceApp::DEF_TRACE_TO_WINDOW = true;
+const int   CSockTraceApp::DEF_TRACE_LINES     = 100;
+const bool  CSockTraceApp::DEF_TRACE_TO_FILE   = false;
+const char* CSockTraceApp::DEF_TRACE_FILE      = "SockTrace.log";
 
 /******************************************************************************
 ** Method:		Constructor
@@ -56,6 +65,14 @@ CSockTraceApp::CSockTraceApp()
 	: CApp(m_AppWnd, m_AppCmds)
 	, m_nInstance(1)
 	, m_bCfgModified(false)
+	, m_bTrayIcon(DEF_TRAY_ICON)
+	, m_bMinToTray(DEF_MIN_TO_TRAY)
+	, m_bTraceConns(DEF_TRACE_CONNS)
+	, m_bTraceData(DEF_TRACE_DATA)
+	, m_bTraceToWindow(DEF_TRACE_TO_WINDOW)
+	, m_nTraceLines(DEF_TRACE_LINES)
+	, m_bTraceToFile(DEF_TRACE_TO_FILE)
+	, m_strTraceFile(DEF_TRACE_FILE)
 {
 }
 
@@ -94,6 +111,21 @@ CSockTraceApp::~CSockTraceApp()
 
 bool CSockTraceApp::OnOpen()
 {
+	HWND hPrevWnd = NULL;
+
+	// Only allow a single instance.
+	if ((hPrevWnd = ::FindWindow(CAppWnd::WNDCLASS_NAME, NULL)) != NULL)
+	{
+		// If not visible OR minimised, restore it.
+		if (!::IsWindowVisible(hPrevWnd) || ::IsIconic(hPrevWnd))
+		{
+			::ShowWindow(hPrevWnd, SW_RESTORE);
+			::SetForegroundWindow(hPrevWnd);
+		}
+
+		return false;
+	}
+
 	// Set the app title.
 	m_strTitle = "Socket Trace";
 
@@ -102,13 +134,17 @@ bool CSockTraceApp::OnOpen()
 
 	try
 	{
-		// Create the application trace file.
-		m_strTraceFile = CPath(CPath::ApplicationDir(), "SockTrace.log");
+		// Create full path to trace file.
+		m_strTracePath = CPath(CPath::ApplicationDir(), m_strTraceFile);
 
-		CFile fFile;
+		if (m_bTraceToFile)
+		{
+			CFile fFile;
 
-		fFile.Create(m_strTraceFile);
-		fFile.Close();
+			// Truncate the trace file.
+			fFile.Create(m_strTracePath);
+			fFile.Close();
+		}
 	}
 	catch (CFileException& e)
 	{
@@ -121,7 +157,7 @@ bool CSockTraceApp::OnOpen()
 		return false;
 
 	// Show it.
-	if ( (m_iCmdShow == SW_SHOWNORMAL) && (m_rcLastPos.Empty() == false) )
+	if (ShowNormal() && !m_rcLastPos.Empty())
 		m_AppWnd.Move(m_rcLastPos);
 
 	m_AppWnd.Show(m_iCmdShow);
@@ -298,6 +334,10 @@ void CSockTraceApp::CloseSockets()
 
 void CSockTraceApp::Trace(const char* pszMsg, ...)
 {
+	// Ignore, if no output for trace.
+	if ((!m_bTraceToWindow) && (!m_bTraceToFile))
+		return;
+
 	CString strMsg;
 
 	// Setup arguments.
@@ -310,23 +350,30 @@ void CSockTraceApp::Trace(const char* pszMsg, ...)
 	// Prepend date and time.
 	strMsg = CDateTime::Current().ToString() + " " + strMsg;
 
-	// Send to trace window.	
-	m_AppWnd.m_AppDlg.Trace(strMsg);
+	if (m_bTraceToWindow)
+	{
+		// Send to trace window.	
+		m_AppWnd.m_AppDlg.Trace(strMsg);
+	}
 
 	try
 	{
-		CFile fLogFile;
+		if (m_bTraceToFile)
+		{
+			CFile fLogFile;
 
-		// Open application log file.
-		if (m_strTraceFile.Exists())
-			fLogFile.Open(m_strTraceFile, GENERIC_WRITE);
-		else
-			fLogFile.Create(m_strTraceFile);
+			// Open trace file for appending.
+			if (m_strTracePath.Exists())
+				fLogFile.Open(m_strTracePath, GENERIC_WRITE);
+			else
+				fLogFile.Create(m_strTracePath);
 
-		// Write trace message to application log file.
-		fLogFile.Seek(0, FILE_END);
-		fLogFile.WriteLine(strMsg);
-		fLogFile.Close();
+			// Write trace message to end of file.
+			fLogFile.Seek(0, FILE_END);
+			fLogFile.WriteLine(strMsg);
+
+			fLogFile.Close();
+		}
 	}
 	catch (CFileException& /*e*/)
 	{ }
@@ -426,7 +473,18 @@ void CSockTraceApp::LoadConfig()
 		m_aoConfigs.Add(pConfig);
 	}
 
-	// Read the window pos and size.
+	// Read the trace settings.
+	m_bTraceConns    = m_oIniFile.ReadBool  ("Trace", "Connections", m_bTraceConns   );
+	m_bTraceData     = m_oIniFile.ReadBool  ("Trace", "DataFlow",    m_bTraceData    );
+	m_bTraceToWindow = m_oIniFile.ReadBool  ("Trace", "ToWindow",    m_bTraceToWindow);
+	m_nTraceLines    = m_oIniFile.ReadInt   ("Trace", "Lines",       m_nTraceLines   );
+	m_bTraceToFile   = m_oIniFile.ReadBool  ("Trace", "ToFile",      m_bTraceToFile  );
+	m_strTraceFile   = m_oIniFile.ReadString("Trace", "FileName",    m_strTraceFile  );
+
+	// Read the UI settings.
+	m_bTrayIcon  = m_oIniFile.ReadBool("UI", "TrayIcon",  m_bTrayIcon );
+	m_bMinToTray = m_oIniFile.ReadBool("UI", "MinToTray", m_bMinToTray);
+
 	m_rcLastPos.left   = m_oIniFile.ReadInt("UI", "Left",   0);
 	m_rcLastPos.top    = m_oIniFile.ReadInt("UI", "Top",    0);
 	m_rcLastPos.right  = m_oIniFile.ReadInt("UI", "Right",  0);
@@ -480,6 +538,18 @@ void CSockTraceApp::SaveConfig()
 			m_oIniFile.WriteString(strSection, "Send", pConfig->m_strSendFile);
 			m_oIniFile.WriteString(strSection, "Recv", pConfig->m_strRecvFile);
 		}
+
+		// Write the trace settings.
+		m_oIniFile.WriteBool  ("Trace", "Connections", m_bTraceConns   );
+		m_oIniFile.WriteBool  ("Trace", "DataFlow",    m_bTraceData    );
+		m_oIniFile.WriteBool  ("Trace", "ToWindow",    m_bTraceToWindow);
+		m_oIniFile.WriteInt   ("Trace", "Lines",       m_nTraceLines   );
+		m_oIniFile.WriteBool  ("Trace", "ToFile",      m_bTraceToFile  );
+		m_oIniFile.WriteString("Trace", "FileName",    m_strTraceFile  );
+
+		// Write the UI settings.
+		m_oIniFile.WriteBool("UI", "TrayIcon",  m_bTrayIcon );
+		m_oIniFile.WriteBool("UI", "MinToTray", m_bMinToTray);
 	}
 
 	// Write the window pos and size.
@@ -543,7 +613,8 @@ void CSockTraceApp::OnAcceptReady(CTCPSvrSocket* pSvrSocket)
 
 			ASSERT(pInpSocket != NULL);
 
-			Trace("Connection accepted from %s", pInpSocket->Host());
+			if (App.m_bTraceConns)
+				Trace("Connection accepted from %s", pInpSocket->Host());
 
 			// Find the config for the server socket.
 			CSockConfig* pConfig = FindConfig(pSvrSocket->Type(), pSvrSocket->Port());
@@ -555,7 +626,8 @@ void CSockTraceApp::OnAcceptReady(CTCPSvrSocket* pSvrSocket)
 
 			pOutSocket->Connect(pConfig->m_strDstHost, pConfig->m_nDstPort);
 
-			Trace("Opened TCP connection %d to server %s:%d", m_nInstance, pOutSocket->Host(), pOutSocket->Port());
+			if (App.m_bTraceConns)
+				Trace("Opened TCP connection %d to server %s:%d", m_nInstance, pOutSocket->Host(), pOutSocket->Port());
 
 			// Attach event handler.
 			pInpSocket->AddClientListener(this);
@@ -620,7 +692,8 @@ void CSockTraceApp::OnReadReady(CSocket* pSocket)
 				// Read data from the client socket.
 				if ((nRead = pSockPair->m_pInpSocket->Recv(oBuffer)) > 0)
 				{
-					Trace("Forwarded %d bytes to the server on connection %d", nRead, pSockPair->m_nInstance);
+					if (App.m_bTraceData)
+						Trace("Forwarded %d bytes to the server on connection %d", nRead, pSockPair->m_nInstance);
 
 					// Send down the server socket.
 					pSockPair->m_pOutSocket->Send(oBuffer.Buffer(), nRead);
@@ -642,7 +715,8 @@ void CSockTraceApp::OnReadReady(CSocket* pSocket)
 				// Read data from the server socket.
 				if ((nRead = pSockPair->m_pOutSocket->Recv(oBuffer)) > 0)
 				{
-					Trace("Forwarded %d bytes to the client on connection %d", nRead, pSockPair->m_nInstance);
+					if (App.m_bTraceData)
+						Trace("Returned %d bytes to the client on connection %d", nRead, pSockPair->m_nInstance);
 
 					// Send down the client socket.
 					pSockPair->m_pInpSocket->Send(oBuffer.Buffer(), nRead);
@@ -671,7 +745,8 @@ void CSockTraceApp::OnReadReady(CSocket* pSocket)
 				// Read data from the client socket.
 				if ((nRead = pSockPair->m_oInpSocket.RecvFrom(oBuffer, pSockPair->m_oSrcAddr, pSockPair->m_nSrcPort)) > 0)
 				{
-					Trace("Forwarded %d bytes to the server (%s:%d)", nRead, inet_ntoa(pSockPair->m_oSrcAddr), pSockPair->m_nSrcPort);
+					if (App.m_bTraceData)
+						Trace("Forwarded %d bytes to the server (%s:%d)", nRead, inet_ntoa(pSockPair->m_oSrcAddr), pSockPair->m_nSrcPort);
 
 					// Send down the server socket.
 					pSockPair->m_oOutSocket.SendTo(oBuffer.Buffer(), nRead, pSockPair->m_oDstAddr, pSockPair->m_nDstPort);
@@ -695,7 +770,8 @@ void CSockTraceApp::OnReadReady(CSocket* pSocket)
 				// Read data from the server socket.
 				if ((nRead = pSockPair->m_oOutSocket.RecvFrom(oBuffer, oAddress, nPort)) > 0)
 				{
-					Trace("Forwarded %d bytes to the client (%s:%d)", nRead, inet_ntoa(oAddress), nPort);
+					if (App.m_bTraceData)
+						Trace("Returned %d bytes to the client (%s:%d)", nRead, inet_ntoa(oAddress), nPort);
 
 					// Send down the client socket.
 					pSockPair->m_oInpSocket.SendTo(oBuffer.Buffer(), nRead, pSockPair->m_oSrcAddr, pSockPair->m_nSrcPort);
@@ -741,7 +817,8 @@ void CSockTraceApp::OnClosed(CSocket* pSocket, int /*nReason*/)
 	// Must be a TCP pair.
 	CTCPSockPair* pTCPSockPair = static_cast<CTCPSockPair*>(pSockPair);
 
-	Trace("Connection %d closed on port %d", pSockPair->m_nInstance, pSockPair->m_pConfig->m_nSrcPort);
+	if (App.m_bTraceConns)
+		Trace("Connection %d closed on port %d", pSockPair->m_nInstance, pSockPair->m_pConfig->m_nSrcPort);
 
 	// Detach event handler.
 	pTCPSockPair->m_pInpSocket->RemoveClientListener(this);

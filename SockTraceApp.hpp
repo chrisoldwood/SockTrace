@@ -54,7 +54,17 @@ public:
 	CUDPSvrSockets	m_aoUDPSvrSocks;	// The UDP client <-> server sockets.
 	CSocketMap		m_oSockMap;			// The socket -> socket pair map.
 
-	CPath			m_strTraceFile;		// Application trace file.
+	bool			m_bTrayIcon;		// Show system tray indicator?
+	bool			m_bMinToTray;		// Minimise to system tray?
+
+	bool			m_bTraceConns;		// Trace connections?
+	bool			m_bTraceData;		// Trace data transfer?
+	bool			m_bTraceToWindow;	// Trace output to window?
+	int				m_nTraceLines;		// Trace lines in window.
+	bool			m_bTraceToFile;		// Trace output to file?
+	CString			m_strTraceFile;		// Trace filename.
+
+	CPath			m_strTracePath;		// The trace file full path.
 
 	//
 	// Methods.
@@ -92,6 +102,15 @@ protected:
 	// Constants.
 	//
 	static const char* INI_FILE_VER;
+
+	static const bool  DEF_TRAY_ICON;
+	static const bool  DEF_MIN_TO_TRAY;
+	static const bool  DEF_TRACE_CONNS;
+	static const bool  DEF_TRACE_DATA;
+	static const bool  DEF_TRACE_TO_WINDOW;
+	static const int   DEF_TRACE_LINES;
+	static const bool  DEF_TRACE_TO_FILE;
+	static const char* DEF_TRACE_FILE;
 
 	//
 	// Socket event handlers.
