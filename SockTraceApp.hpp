@@ -12,6 +12,12 @@
 #ifndef SOCKTRACEAPP_HPP
 #define SOCKTRACEAPP_HPP
 
+// Template shorthands.
+typedef TPtrArray<CSockConfig>   CSockConfigs;
+typedef TPtrArray<CTCPSvrSocket> CTCPSvrSockets;
+typedef TPtrArray<CTCPSockPair>  CTCPCltSockets;
+typedef TPtrArray<CUDPSockPair>  CUDPSvrSockets;
+
 /******************************************************************************
 ** 
 ** The application class.
@@ -35,28 +41,17 @@ public:
 	CAppCmds		m_AppCmds;			// Command handler.
 
 	uint			m_nTimerID;			// The background timer ID.
+	uint			m_nInstance;		// The instance counter.
 
 	CIniFile		m_oIniFile;			// .INI FIle
 	CRect			m_rcLastPos;		// Main window position.
 
-	CString			m_strType;			// The socket type.
-	int				m_nType;			// The socket type (STREAM/DGRAM).
-	CString			m_strSrcHost;		// The source hostname.
-	uint			m_nSrcPort;			// The source port number.
-	CString			m_strDstHost;		// The destination hostname.
-	uint			m_nDstPort;			// The destination port number.
+	CSockConfigs	m_aoConfigs;		// The socket configurations.
+	CTCPSvrSockets	m_aoTCPSvrSocks;	// The TCP listener sockets.
+	CTCPCltSockets	m_aoTCPCltSocks;	// The TCP client <-> server sockets.
+	CUDPSvrSockets	m_aoUDPSvrSocks;	// The UDP client <-> server sockets.
 
-	CString			m_strSendFile;		// The Send log filename.
-	CString			m_strRecvFile;		// The Receive log filename.
-
-	CPath			m_strSendPath;		// Path of log file for data sent.
-	CPath			m_strRecvPath;		// Path of log file for data recieved.
-
-	CTCPSvrSocket*	m_pTCPLstSock;		// The TCP listening socket.
-	CTCPCltSocket*	m_pTCPInpSocket;	// The TCP incoming socket.
-	CTCPCltSocket*	m_pTCPOutSocket;	// The TCP outgoing socket.
-	CUDPSvrSocket*	m_pUDPInpSocket;	// The UDP incoming socket.
-	CUDPSvrSocket*	m_pUDPOutSocket;	// The UDP outgoing socket.
+	CPath			m_strTraceFile;		// Application trace file.
 
 	//
 	// Methods.
@@ -77,18 +72,21 @@ protected:
 	virtual	bool OnClose();
 
 	//
-	// Internal methods.
+	// Config methods.
 	//
 	void LoadConfig();
 	void SaveConfig();
+
+	//
+	// Socket methods.
+	//
+	CSockConfig* FindConfig(int nType, uint nPort) const;
 
 	//
 	// Constants.
 	//
 	static const char* INI_FILE_VER;
 	static const uint  BG_TIMER_FREQ;
-	static const char* DEF_SEND_FILE;
-	static const char* DEF_RECV_FILE;
 
 	//
 	// The backgound timer methods.
@@ -98,10 +96,10 @@ protected:
 	//
 	// Socket event handlers.
 	//
-	void HandleConnects();
+	void HandleTCPConnects();
 	void HandleTCPPackets();
 	void HandleUDPPackets();
-	void HandleDisconnects();
+	void HandleTCPDisconnects();
 };
 
 /******************************************************************************
