@@ -1,3 +1,3 @@
 - Switch from timer/polling sockets to Async/EventSelect().
 
-- Add option to edit the Hosts file.
+- Display host/address so that it can be copied.
