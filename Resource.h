@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Developer Studio generated include file.
-// Used by App.rc
+// Used by SockTrace.rc
 //
 #define IDR_APPICON                     2
 #define IDR_APPMENU                     3
@@ -8,8 +8,10 @@
 #define IDR_APPTOOLBAR                  5
 #define ID_FILE_POPUP                   100
 #define ID_FILE_EXIT                    109
+#define IDD_CONNS                       134
 #define ID_VIEW_POPUP                   200
-#define ID_VIEW_CLEAR_TRACE             201
+#define ID_VIEW_CONNS                   201
+#define ID_VIEW_CLEAR_TRACE             202
 #define ID_TOOLS_POPUP                  300
 #define ID_TOOLS_HOSTS                  301
 #define ID_OPTIONS_POPUP                400
@@ -43,9 +45,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        134
-#define _APS_NEXT_COMMAND_VALUE         168
-#define _APS_NEXT_CONTROL_VALUE         1097
+#define _APS_NEXT_RESOURCE_VALUE        135
+#define _APS_NEXT_COMMAND_VALUE         169
+#define _APS_NEXT_CONTROL_VALUE         1098
 #define _APS_NEXT_SYMED_VALUE           104
 #endif
 #endif

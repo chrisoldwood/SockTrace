@@ -76,6 +76,8 @@ BEGIN
     END
     POPUP "&View"
     BEGIN
+        MENUITEM "&Connections",                ID_VIEW_CONNS
+        MENUITEM SEPARATOR
         MENUITEM "&Clear Trace",                ID_VIEW_CLEAR_TRACE
     END
     POPUP "&Tools"
@@ -117,7 +119,7 @@ BEGIN
     CTEXT           "v1.0 Beta",IDC_VERSION,40,20,70,8,SS_CENTERIMAGE
     CTEXT           "Freeware",IDC_STATIC,40,30,70,8,SS_CENTERIMAGE
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,50,99,1
-    CTEXT           "(C) Chris Oldwood 2003",IDC_STATIC,10,60,100,10,
+    CTEXT           "(C) Chris Oldwood 2003-2004",IDC_STATIC,10,60,100,10,
                     SS_CENTERIMAGE
     CTEXT           "gort@cix.co.uk",IDC_EMAIL,10,70,100,10,SS_NOTIFY | 
                     SS_CENTERIMAGE
@@ -164,6 +166,17 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,130,135,50,14
 END
 
+IDD_CONNS DIALOGEX 0, 0, 312, 135
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Open Sockets"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "Close",IDCANCEL,255,115,50,14
+    CONTROL         "List1",IDC_SOCKETS,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_NOSORTHEADER | 
+                    WS_BORDER | WS_TABSTOP,5,5,300,100,WS_EX_CLIENTEDGE
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -203,6 +216,14 @@ BEGIN
         RIGHTMARGIN, 240
         TOPMARGIN, 7
         BOTTOMMARGIN, 155
+    END
+
+    IDD_CONNS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 305
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 128
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -270,6 +291,7 @@ END
 STRINGTABLE DISCARDABLE 
 BEGIN
     ID_VIEW_POPUP           "View options"
+    ID_VIEW_CONNS           "View the connections\nConnections"
     ID_VIEW_CLEAR_TRACE     "Clear the trace window"
 END
 
