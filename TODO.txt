@@ -1,1 +1,7 @@
-- View logfiles command.
+- View logfiles from connection history dialog.
+
+- Remember resolved names (use combo in config dialog).
+
+- Warn about port reuse before accepting.
+
+- Configure trace settings.
