@@ -31,7 +31,7 @@
 #define IDC_SEND_FILE                   1093
 #define IDC_RECV_FILE                   1094
 #define IDC_PROTOCOL                    1095
-#define IDC_CHECK                       1096
+#define IDC_RESOLVE                     1096
 #define IDD_MAIN                        5000
 #define IDD_ABOUT                       5001
 #define IDD_SOCK_OPTIONS                5002
