@@ -134,23 +134,20 @@ void CSockOptsDlg::OnAdd()
 {
 	CSockCfgDlg Dlg;
 
+	// Set ports in use.
+	for (int j = 0; j < m_aoConfigs.Size(); ++j)
+	{
+		CSockConfig* pCfg = m_aoConfigs[j];
+
+		if (pCfg->m_nType == SOCK_STREAM)
+			Dlg.m_anTCPPorts.Add(pCfg->m_nSrcPort);
+		else
+			Dlg.m_anUDPPorts.Add(pCfg->m_nSrcPort);
+	}
+
 	// Show socket config dialog.
 	if (Dlg.RunModal(*this) == IDOK)
 	{
-		// Check port isn't already in use...
-		for (int j = 0; j < m_aoConfigs.Size(); ++j)
-		{
-			CSockConfig* pTmpCfg = m_aoConfigs[j];
-
-			// Same protocol AND port?
-			if ( (pTmpCfg->m_nType    == Dlg.m_oConfig.m_nType   )
-			  && (pTmpCfg->m_nSrcPort == Dlg.m_oConfig.m_nSrcPort) )
-			{
-				AlertMsg("The local port (%d) has already been used.", pTmpCfg->m_nSrcPort);
-				return;
-			}
-		}
-
 		// Add config to collection.
 		CSockConfig* pConfig = new CSockConfig;
 
@@ -198,24 +195,23 @@ void CSockOptsDlg::OnEdit()
 
 	Dlg.m_oConfig = *pConfig;
 
+	// Set ports in use.
+	for (int j = 0; j < m_aoConfigs.Size(); ++j)
+	{
+		CSockConfig* pCfg = m_aoConfigs[j];
+
+		if (pCfg == pConfig)
+			continue;
+
+		if (pCfg->m_nType == SOCK_STREAM)
+			Dlg.m_anTCPPorts.Add(pCfg->m_nSrcPort);
+		else
+			Dlg.m_anUDPPorts.Add(pCfg->m_nSrcPort);
+	}
+
 	// Show socket config dialog.
 	if (Dlg.RunModal(*this) == IDOK)
 	{
-		// Check port isn't already in use...
-		for (int j = 0; j < m_aoConfigs.Size(); ++j)
-		{
-			CSockConfig* pTmpCfg = m_aoConfigs[j];
-
-			// Same protocol AND port AND not same config?
-			if ( (pTmpCfg->m_nType    == Dlg.m_oConfig.m_nType   )
-			  && (pTmpCfg->m_nSrcPort == Dlg.m_oConfig.m_nSrcPort)
-			  && (pTmpCfg             != pConfig) )
-			{
-				AlertMsg("The local port (%d) has already been used.", pTmpCfg->m_nSrcPort);
-				return;
-			}
-		}
-
 		// Update config.
 		*pConfig = Dlg.m_oConfig;
 
