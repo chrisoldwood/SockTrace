@@ -716,22 +716,6 @@ void CSockTraceApp::OnReadReady(CSocket* pSocket)
 }
 
 /******************************************************************************
-** Method:		OnWriteReady()
-**
-** Description:	The socket has space to write.
-**
-** Parameters:	pSocket		The socket.
-**
-** Returns:		Nothing.
-**
-*******************************************************************************
-*/
-
-void CSockTraceApp::OnWriteReady(CSocket* /*pSocket*/)
-{
-}
-
-/******************************************************************************
 ** Method:		OnClosed()
 **
 ** Description:	The socket has been closed.
@@ -770,4 +754,30 @@ void CSockTraceApp::OnClosed(CSocket* pSocket, int /*nReason*/)
 	// Remove socket pair from map.
 	m_oSockMap.Remove(pTCPSockPair->m_pInpSocket);
 	m_oSockMap.Remove(pTCPSockPair->m_pOutSocket);
+}
+
+/******************************************************************************
+** Method:		OnError()
+**
+** Description:	An error has occurred on the socket.
+**
+** Parameters:	pSocket		The socket.
+**				nEvent		The socket event type.
+**				nError		The error code.
+**
+** Returns:		Nothing.
+**
+*******************************************************************************
+*/
+
+void CSockTraceApp::OnError(CSocket* pSocket, int nEvent, int nError)
+{
+	CSockPair* pSockPair = NULL;
+
+	// Find the client <-> server pair.
+	m_oSockMap.Find(pSocket, pSockPair);
+
+	ASSERT(pSockPair != NULL);
+
+	Trace("%s Error on connection %d: %s", CSocket::AsyncEventStr(nEvent), pSockPair->m_nInstance, CWinSock::ErrorToSymbol(nError));
 }

@@ -98,9 +98,8 @@ protected:
 	//
 	virtual void OnAcceptReady(CTCPSvrSocket* pSocket);
 	virtual void OnReadReady(CSocket* pSocket);
-	virtual void OnWriteReady(CSocket* pSocket);
 	virtual void OnClosed(CSocket* pSocket, int nReason);
-//	virtual void OnError(CSocket* pSocket, int nEvent, int nError);
+	virtual void OnError(CSocket* pSocket, int nEvent, int nError);
 };
 
 /******************************************************************************
