@@ -47,6 +47,8 @@ public:
 	CRect			m_rcLastPos;		// Main window position.
 
 	CSockConfigs	m_aoConfigs;		// The socket configurations.
+	bool			m_bCfgModified;		// Config modified?
+
 	CTCPSvrSockets	m_aoTCPSvrSocks;	// The TCP listener sockets.
 	CTCPCltSockets	m_aoTCPCltSocks;	// The TCP client <-> server sockets.
 	CUDPSvrSockets	m_aoUDPSvrSocks;	// The UDP client <-> server sockets.
@@ -56,6 +58,9 @@ public:
 	//
 	// Methods.
 	//
+	void OpenSockets();
+	void CloseSockets();
+
 	void Trace(const char* pszMsg, ...);
 	void LogData(CPath& strFileName, const void* pvData, uint nLength);
 
