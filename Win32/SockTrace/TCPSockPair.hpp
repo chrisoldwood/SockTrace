@@ -19,24 +19,20 @@
 *******************************************************************************
 */
 
-class CTCPSockPair
+class CTCPSockPair : public CSockPair
 {
 public:
 	//
 	// Constructors/Destructor.
 	//
-	CTCPSockPair(uint nInstance, CSockConfig* pConfig, CTCPCltSocket* pInpSocket, CTCPCltSocket* pOutSocket);
-	~CTCPSockPair();
+	CTCPSockPair(CSockConfig* pConfig, uint nInstance, CTCPCltSocket* pInpSocket, CTCPCltSocket* pOutSocket);
+	virtual ~CTCPSockPair();
 	
 	//
 	// Members.
 	//
-	uint			m_nInstance;	// The pair instance ID.
-	CSockConfig*	m_pConfig;		// The socket config.
 	CTCPCltSocket*	m_pInpSocket;	// The client connection.
 	CTCPCltSocket*	m_pOutSocket;	// The server connection.
-	CPath			m_strSendFile;	// Path of log file for data sent.
-	CPath			m_strRecvFile;	// Path of log file for data recieved.
 };
 
 /******************************************************************************
@@ -46,23 +42,11 @@ public:
 *******************************************************************************
 */
 
-inline CTCPSockPair::CTCPSockPair(uint nInstance, CSockConfig* pConfig, CTCPCltSocket* pInpSocket, CTCPCltSocket* pOutSocket)
-	: m_nInstance(nInstance)
-	, m_pConfig(pConfig)
+inline CTCPSockPair::CTCPSockPair(CSockConfig* pConfig, uint nInstance, CTCPCltSocket* pInpSocket, CTCPCltSocket* pOutSocket)
+	: CSockPair(pConfig, nInstance)
 	, m_pInpSocket(pInpSocket)
 	, m_pOutSocket(pOutSocket)
 {
-	ASSERT(pConfig != NULL);
-
-	// Apply instance number to log file names.
-	m_strSendFile.Format(m_pConfig->m_strSendFile, m_nInstance);
-	m_strRecvFile.Format(m_pConfig->m_strRecvFile, m_nInstance);
-
-	CPath strAppDir = CPath::ApplicationDir();
-
-	// Prepend app folder.
-	m_strSendFile = strAppDir + m_strSendFile;
-	m_strRecvFile = strAppDir + m_strRecvFile;
 }
 
 inline CTCPSockPair::~CTCPSockPair()
