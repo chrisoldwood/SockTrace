@@ -1,7 +1,1 @@
-- Switch from timer/polling sockets to Async/EventSelect().
-
-- Add double-click for editing config.
-
-- Warn if multiple ports set-up.
-
 - View logfiles command.
