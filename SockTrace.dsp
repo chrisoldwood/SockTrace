@@ -196,6 +196,10 @@ SOURCE=.\UDPSockPair.hpp
 
 SOURCE=.\App.ico
 # End Source File
+# Begin Source File
+
+SOURCE=.\App.rcv
+# End Source File
 # End Group
 # Begin Source File
 
