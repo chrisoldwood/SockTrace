@@ -593,6 +593,8 @@ void CSockTraceApp::HandleTCPConnects()
 	for (int i = 0; i < m_aoTCPSvrSocks.Size(); ++i)
 	{
 		CTCPSvrSocket* pSvrSocket = m_aoTCPSvrSocks[i];
+		CTCPCltSocket* pInpSocket = NULL;
+		CTCPCltSocket* pOutSocket = NULL;
 
 		try
 		{
@@ -600,7 +602,7 @@ void CSockTraceApp::HandleTCPConnects()
 			if (pSvrSocket->CanAccept())
 			{
 				// Accept the connection.
-				CTCPCltSocket* pInpSocket = pSvrSocket->Accept();
+				pInpSocket = pSvrSocket->Accept();
 
 				ASSERT(pInpSocket != NULL);
 
@@ -612,7 +614,7 @@ void CSockTraceApp::HandleTCPConnects()
 				ASSERT(pConfig != NULL);
 
 				// Create socket to destination.
-				CTCPCltSocket* pOutSocket = new CTCPCltSocket();
+				pOutSocket = new CTCPCltSocket();
 
 				pOutSocket->Connect(pConfig->m_strDstHost, pConfig->m_nDstPort);
 
@@ -625,6 +627,10 @@ void CSockTraceApp::HandleTCPConnects()
 		catch (CSocketException& e)
 		{
 			Trace("Failed to accept client connection on port %d  - %s", pSvrSocket->Port(), e.ErrorText());
+
+			// Cleanup.
+			delete pInpSocket;
+			delete pOutSocket;
 		}
 	}
 }
