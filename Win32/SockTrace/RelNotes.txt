@@ -1,3 +1,17 @@
+Version 1.5
+===========
+
+- Reworked socket code to use non-blocking sockets.
+- Added View menu item to show a connections summary.
+
+
+Version 1.2
+===========
+
+- Added Tools menu item to edit the HOSTS file.
+- Changed the configure dialog to resolve the host name.
+
+
 Version 1.1
 ===========
 
@@ -16,4 +30,4 @@ Version 1.0
 Chris Oldwood 
 (gort@cix.co.uk)
 
-19th June 2003
+6th July 2004
