@@ -1,5 +1,5 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by SockTrace.rc
 //
 #define IDR_APPICON                     2
@@ -15,7 +15,9 @@
 #define ID_TOOLS_POPUP                  300
 #define ID_TOOLS_HOSTS                  301
 #define ID_OPTIONS_POPUP                400
-#define ID_OPTIONS_SOCKET               401
+#define ID_OPTIONS_GENERAL              401
+#define ID_OPTIONS_TRACE                402
+#define ID_OPTIONS_SOCKET               403
 #define ID_HELP_POPUP                   900
 #define ID_HELP_CONTENTS                901
 #define ID_HELP_ABOUT                   902
@@ -24,6 +26,7 @@
 #define IDC_VERSION                     1085
 #define IDC_TRACE                       1086
 #define IDC_SOCKETS                     1088
+#define IDC_DATA                        1088
 #define IDC_ADD                         1089
 #define IDC_EDIT                        1090
 #define IDC_SRC_PORT                    1090
@@ -32,12 +35,18 @@
 #define IDC_DST_HOST                    1092
 #define IDC_SEND_FILE                   1093
 #define IDC_RECV_FILE                   1094
+#define IDC_WINDOW                      1094
 #define IDC_PROTOCOL                    1095
+#define IDC_FILE                        1095
 #define IDC_RESOLVE                     1096
+#define IDC_CONNECTIONS                 1096
+#define IDC_MAX_LINES                   1097
+#define IDC_FILE_NAME                   1098
 #define IDD_MAIN                        5000
 #define IDD_ABOUT                       5001
 #define IDD_SOCK_OPTIONS                5002
 #define IDD_SOCK_CONFIG                 5003
+#define IDD_TRACE_OPTIONS               5004
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
