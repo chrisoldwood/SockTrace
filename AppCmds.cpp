@@ -37,6 +37,8 @@ CAppCmds::CAppCmds()
 		CMD_ENTRY(ID_FILE_EXIT,			OnFileExit,			NULL,				-1)
 		// View menu.
 		CMD_ENTRY(ID_VIEW_CLEAR_TRACE,	OnViewClearTrace,	NULL,				-1)
+		// Tools menu.
+		CMD_ENTRY(ID_TOOLS_HOSTS,		OnToolsEditHosts,	NULL,				-1)
 		// Options menu.
 		CMD_ENTRY(ID_OPTIONS_SOCKET,	OnOptionsSocket,	NULL,				-1)
 		// Help menu.
@@ -92,6 +94,35 @@ void CAppCmds::OnFileExit()
 void CAppCmds::OnViewClearTrace()
 {
 	App.m_AppWnd.m_AppDlg.Clear();
+}
+
+/******************************************************************************
+** Method:		OnToolsEditHosts()
+**
+** Description:	Edit the HOSTS file.
+**
+** Parameters:	None.
+**
+** Returns:		Nothing.
+**
+*******************************************************************************
+*/
+
+void CAppCmds::OnToolsEditHosts()
+{
+	// Get the full path to the HOSTS file.
+	CPath   strHOSTS(CPath::SystemDir(), "drivers\\etc\\HOSTS");
+
+	CString strCmdLine("NOTEPAD.EXE ");
+
+	strCmdLine += strHOSTS;
+
+	// Launch NotePad to edit the file.
+	uint nResult = ::WinExec(strCmdLine, SW_SHOW);
+
+	// Report any error.
+	if (nResult <= 31)
+		App.AlertMsg("Failed to execute:\n\n%s\n\nError code: %d", strCmdLine, nResult);
 }
 
 /******************************************************************************
