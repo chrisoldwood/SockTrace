@@ -36,6 +36,7 @@ public:
 	void OnFileExit();
 
 	// View menu.
+	void OnViewConnections();
 	void OnViewClearTrace();
 
 	// Tools menu.
