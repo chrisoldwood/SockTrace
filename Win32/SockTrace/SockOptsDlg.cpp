@@ -38,9 +38,10 @@ CSockOptsDlg::CSockOptsDlg()
 	END_CTRL_TABLE
 
 	DEFINE_CTRLMSG_TABLE
-		CMD_CTRLMSG(IDC_ADD,    BN_CLICKED, OnAdd   )
-		CMD_CTRLMSG(IDC_EDIT,   BN_CLICKED, OnEdit  )
-		CMD_CTRLMSG(IDC_REMOVE, BN_CLICKED, OnRemove)
+		CMD_CTRLMSG(IDC_ADD,     BN_CLICKED, OnAdd            )
+		CMD_CTRLMSG(IDC_EDIT,    BN_CLICKED, OnEdit           )
+		CMD_CTRLMSG(IDC_REMOVE,  BN_CLICKED, OnRemove         )
+		NFY_CTRLMSG(IDC_SOCKETS, NM_DBLCLK,  OnListDoubleClick)
 	END_CTRLMSG_TABLE
 }
 
@@ -76,15 +77,13 @@ CSockOptsDlg::~CSockOptsDlg()
 void CSockOptsDlg::OnInitDialog()
 {
 	// Set listview style.
-//	m_lvSocks.Font(CFont(ANSI_FIXED_FONT));
 	m_lvSocks.FullRowSelect(true);
-//	m_lvSocks.GridLines(true);
 
 	// Create listview columns.
-	m_lvSocks.InsertColumn(SRC_PORT,     "Port",         70, LVCFMT_LEFT);
+	m_lvSocks.InsertColumn(SRC_PORT,     "Local Port",   75, LVCFMT_LEFT);
 	m_lvSocks.InsertColumn(SRC_PROTOCOL, "Protocol",     75, LVCFMT_LEFT);
 	m_lvSocks.InsertColumn(DST_HOST,     "Destination", 175, LVCFMT_LEFT);
-	m_lvSocks.InsertColumn(DST_PORT,     "Port",         70, LVCFMT_LEFT);
+	m_lvSocks.InsertColumn(DST_PORT,     "Remote Port",  75, LVCFMT_LEFT);
 
 	// Add current socket configs.
 	for (int i = 0; i < m_aoConfigs.Size(); ++i)
@@ -138,6 +137,20 @@ void CSockOptsDlg::OnAdd()
 	// Show socket config dialog.
 	if (Dlg.RunModal(*this) == IDOK)
 	{
+		// Check port isn't already in use...
+		for (int j = 0; j < m_aoConfigs.Size(); ++j)
+		{
+			CSockConfig* pTmpCfg = m_aoConfigs[j];
+
+			// Same protocol AND port?
+			if ( (pTmpCfg->m_nType    == Dlg.m_oConfig.m_nType   )
+			  && (pTmpCfg->m_nSrcPort == Dlg.m_oConfig.m_nSrcPort) )
+			{
+				AlertMsg("The local port (%d) has already been used.", pTmpCfg->m_nSrcPort);
+				return;
+			}
+		}
+
 		// Add config to collection.
 		CSockConfig* pConfig = new CSockConfig;
 
@@ -188,6 +201,21 @@ void CSockOptsDlg::OnEdit()
 	// Show socket config dialog.
 	if (Dlg.RunModal(*this) == IDOK)
 	{
+		// Check port isn't already in use...
+		for (int j = 0; j < m_aoConfigs.Size(); ++j)
+		{
+			CSockConfig* pTmpCfg = m_aoConfigs[j];
+
+			// Same protocol AND port AND not same config?
+			if ( (pTmpCfg->m_nType    == Dlg.m_oConfig.m_nType   )
+			  && (pTmpCfg->m_nSrcPort == Dlg.m_oConfig.m_nSrcPort)
+			  && (pTmpCfg             != pConfig) )
+			{
+				AlertMsg("The local port (%d) has already been used.", pTmpCfg->m_nSrcPort);
+				return;
+			}
+		}
+
 		// Update config.
 		*pConfig = Dlg.m_oConfig;
 
@@ -249,4 +277,24 @@ void CSockOptsDlg::UpdateConfig(int nItem, CSockConfig* pConfig)
 	m_lvSocks.ItemText(nItem, SRC_PROTOCOL, pConfig->m_strType);
 	m_lvSocks.ItemText(nItem, DST_HOST,     pConfig->m_strDstHost);
 	m_lvSocks.ItemText(nItem, DST_PORT,     CStrCvt::FormatInt(pConfig->m_nDstPort));
+}
+
+/******************************************************************************
+** Method:		OnListDoubleClick()
+**
+** Description:	List item double-clicked. Invoke "Edit | File Props" command.
+**
+** Parameters:	See WM_NOTIFY.
+**
+** Returns:		See WM_NOTIFY.
+**
+*******************************************************************************
+*/
+
+LRESULT CSockOptsDlg::OnListDoubleClick(NMHDR& /*oHdr*/)
+{
+	if (m_lvSocks.IsSelection())
+		PostCtrlMsg(BN_CLICKED, IDC_EDIT, Control(IDC_EDIT).Handle());
+
+	return 0;
 }

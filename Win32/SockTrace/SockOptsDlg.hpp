@@ -54,6 +54,7 @@ protected:
 	//
 	virtual void OnInitDialog();
 	virtual bool OnOk();
+	LRESULT OnListDoubleClick(NMHDR& oHdr);
 
 	void OnAdd();
 	void OnEdit();
