@@ -35,6 +35,9 @@ public:
 	// File menu.
 	void OnFileExit();
 
+	// View menu.
+	void OnViewClearTrace();
+
 	// Options menu.
 	void OnOptionsSocket();
 
