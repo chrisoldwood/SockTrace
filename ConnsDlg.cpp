@@ -37,6 +37,11 @@ CConnsDlg::CConnsDlg()
 
 	DEFINE_CTRLMSG_TABLE
 	END_CTRLMSG_TABLE
+
+	DEFINE_GRAVITY_TABLE
+		CTRLGRAV(IDC_SOCKETS, LEFT_EDGE,  TOP_EDGE,    RIGHT_EDGE, BOTTOM_EDGE)
+		CTRLGRAV(IDCANCEL,    RIGHT_EDGE, BOTTOM_EDGE, RIGHT_EDGE, BOTTOM_EDGE)
+	END_GRAVITY_TABLE
 }
 
 /******************************************************************************
@@ -58,6 +63,7 @@ void CConnsDlg::OnInitDialog()
 
 	// Create listview columns.
 	m_lvSocks.InsertColumn(INSTANCE, "Conn",   50, LVCFMT_LEFT);
+	m_lvSocks.InsertColumn(STATUS,   "Status", 50, LVCFMT_LEFT);
 	m_lvSocks.InsertColumn(PROTOCOL, "Proto",  50, LVCFMT_LEFT);
 	m_lvSocks.InsertColumn(HOST,     "Host",  150, LVCFMT_LEFT);
 	m_lvSocks.InsertColumn(PORT,     "Port",   50, LVCFMT_LEFT);
@@ -71,10 +77,10 @@ void CConnsDlg::OnInitDialog()
 
 		CString strConn = CStrCvt::FormatInt(pPair->m_nInstance);
 
-		if (pPair->m_pInpSocket->IsOpen() && pPair->m_pOutSocket->IsOpen())
-			strConn += '*';
+		bool bOpen = (pPair->m_pInpSocket->IsOpen() && pPair->m_pOutSocket->IsOpen());
 
 		m_lvSocks.InsertItem(i,           strConn);
+		m_lvSocks.ItemText  (i, STATUS,   (bOpen) ? "Open" : "Closed");
 		m_lvSocks.ItemText  (i, PROTOCOL, pPair->m_pConfig->m_strType);
 		m_lvSocks.ItemText  (i, HOST,     pPair->m_pConfig->m_strDstHost);
 		m_lvSocks.ItemText  (i, PORT,     CStrCvt::FormatInt(pPair->m_pConfig->m_nDstPort));

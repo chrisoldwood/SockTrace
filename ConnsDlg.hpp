@@ -41,6 +41,7 @@ protected:
 	enum
 	{
 		INSTANCE,
+		STATUS,
 		PROTOCOL,
 		HOST,
 		PORT,
