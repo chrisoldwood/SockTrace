@@ -4,4 +4,4 @@
 
 - Warn about port reuse before accepting.
 
-- Configure trace settings.
+- Configure trace settings (like NetDDE).
