@@ -43,7 +43,7 @@ CSockCfgDlg::CSockCfgDlg()
 	END_CTRL_TABLE
 
 	DEFINE_CTRLMSG_TABLE
-		CMD_CTRLMSG(IDC_CHECK, BN_CLICKED, OnCheckHost)
+		CMD_CTRLMSG(IDC_RESOLVE, BN_CLICKED, OnResolveHost)
 	END_CTRLMSG_TABLE
 }
 
@@ -129,9 +129,9 @@ bool CSockCfgDlg::OnOk()
 }
 
 /******************************************************************************
-** Method:		OnCheckHost()
+** Method:		OnResolveHost()
 **
-** Description:	Checks that the destination host resolves to an address.
+** Description:	Resolves a destination hostname to an address.
 **
 ** Parameters:	None.
 **
@@ -140,7 +140,7 @@ bool CSockCfgDlg::OnOk()
 *******************************************************************************
 */
 
-void CSockCfgDlg::OnCheckHost()
+void CSockCfgDlg::OnResolveHost()
 {
 	CBusyCursor oHourGlass;
 
@@ -153,9 +153,7 @@ void CSockCfgDlg::OnCheckHost()
 	try
 	{
 		// Attempt to resolve it.
-		CString strIP = CSocket::ResolveStr(strHost);
-
-		NotifyMsg("Resolved %s to %s", strHost, strIP);
+		m_ebDstHost.Text(CSocket::ResolveStr(strHost));
 	}
 	catch (CSocketException& /*e*/)
 	{

@@ -49,7 +49,7 @@ protected:
 	virtual void OnInitDialog();
 	virtual bool OnOk();
 
-	void OnCheckHost();
+	void OnResolveHost();
 
 	//
 	// Internal methods.
