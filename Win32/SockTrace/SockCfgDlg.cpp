@@ -142,11 +142,13 @@ bool CSockCfgDlg::OnOk()
 
 void CSockCfgDlg::OnCheckHost()
 {
-	CString strHost = m_ebDstHost.Text();
+	CBusyCursor oHourGlass;
 
 	// Ignore, if no host supplied.
-	if (strHost.Empty())
+	if (m_ebDstHost.TextLength() == 0)
 		return;
+
+	CString strHost = m_ebDstHost.Text();
 
 	try
 	{
