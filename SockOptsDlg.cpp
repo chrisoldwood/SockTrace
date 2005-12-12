@@ -59,7 +59,7 @@ CSockOptsDlg::CSockOptsDlg()
 
 CSockOptsDlg::~CSockOptsDlg()
 {
-	m_aoConfigs.DeleteAll();
+	DeleteAll(m_aoConfigs);
 }
 
 /******************************************************************************
@@ -86,7 +86,7 @@ void CSockOptsDlg::OnInitDialog()
 	m_lvSocks.InsertColumn(DST_PORT,     "Remote Port",  75, LVCFMT_LEFT);
 
 	// Add current socket configs.
-	for (int i = 0; i < m_aoConfigs.Size(); ++i)
+	for (uint i = 0; i < m_aoConfigs.size(); ++i)
 	{
 		CSockConfig* pConfig = m_aoConfigs[i];
 
@@ -97,7 +97,7 @@ void CSockOptsDlg::OnInitDialog()
 	}
 
 	// Select 1st by default.
-	if (m_aoConfigs.Size() > 0)
+	if (!m_aoConfigs.empty())
 		m_lvSocks.Select(0);
 }
 
@@ -135,14 +135,14 @@ void CSockOptsDlg::OnAdd()
 	CSockCfgDlg Dlg;
 
 	// Set ports in use.
-	for (int j = 0; j < m_aoConfigs.Size(); ++j)
+	for (uint j = 0; j < m_aoConfigs.size(); ++j)
 	{
 		CSockConfig* pCfg = m_aoConfigs[j];
 
 		if (pCfg->m_nType == SOCK_STREAM)
-			Dlg.m_anTCPPorts.Add(pCfg->m_nSrcPort);
+			Dlg.m_anTCPPorts.push_back(pCfg->m_nSrcPort);
 		else
-			Dlg.m_anUDPPorts.Add(pCfg->m_nSrcPort);
+			Dlg.m_anUDPPorts.push_back(pCfg->m_nSrcPort);
 	}
 
 	// Show socket config dialog.
@@ -153,7 +153,7 @@ void CSockOptsDlg::OnAdd()
 
 		*pConfig = Dlg.m_oConfig;
 
-		m_aoConfigs.Add(pConfig);
+		m_aoConfigs.push_back(pConfig);
 
 		// Add config to view.
 		int i = m_lvSocks.ItemCount();
@@ -196,7 +196,7 @@ void CSockOptsDlg::OnEdit()
 	Dlg.m_oConfig = *pConfig;
 
 	// Set ports in use.
-	for (int j = 0; j < m_aoConfigs.Size(); ++j)
+	for (uint j = 0; j < m_aoConfigs.size(); ++j)
 	{
 		CSockConfig* pCfg = m_aoConfigs[j];
 
@@ -204,9 +204,9 @@ void CSockOptsDlg::OnEdit()
 			continue;
 
 		if (pCfg->m_nType == SOCK_STREAM)
-			Dlg.m_anTCPPorts.Add(pCfg->m_nSrcPort);
+			Dlg.m_anTCPPorts.push_back(pCfg->m_nSrcPort);
 		else
-			Dlg.m_anUDPPorts.Add(pCfg->m_nSrcPort);
+			Dlg.m_anUDPPorts.push_back(pCfg->m_nSrcPort);
 	}
 
 	// Show socket config dialog.
@@ -246,7 +246,7 @@ void CSockOptsDlg::OnRemove()
 
 	// Remove from view and collection.
 	m_lvSocks.DeleteItem(nSel);
-	m_aoConfigs.Delete(m_aoConfigs.Find(pConfig));
+	Delete(m_aoConfigs, FindIndexOf(m_aoConfigs, pConfig));
 
 	// Update selection.
 	m_lvSocks.Select((nSel < m_lvSocks.ItemCount()) ? nSel : nSel-1);

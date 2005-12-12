@@ -201,7 +201,7 @@ void CAppCmds::OnOptionsSocket()
 	bool bOpen = false;
 
 	// Check if there are any open connections.
-	for (int i = 0; i < App.m_aoTCPCltSocks.Size(); ++i)
+	for (uint i = 0; i < App.m_aoTCPCltSocks.size(); ++i)
 	{
 		CTCPSockPair* pPair = App.m_aoTCPCltSocks[i];
 
@@ -219,7 +219,7 @@ void CAppCmds::OnOptionsSocket()
 
 	CSockOptsDlg Dlg;
 
-	Dlg.m_aoConfigs.DeepCopy(App.m_aoConfigs);
+	DeepCopy(App.m_aoConfigs, Dlg.m_aoConfigs);
 
 	// Show sockets config dialog.
 	if ( (Dlg.RunModal(App.m_rMainWnd) == IDOK) && (Dlg.m_bModified) )
@@ -227,8 +227,8 @@ void CAppCmds::OnOptionsSocket()
 		// Close all current sockets.
 		App.CloseSockets();
 
-		App.m_aoConfigs.DeleteAll();
-		App.m_aoConfigs.DeepCopy(Dlg.m_aoConfigs);
+		DeleteAll(App.m_aoConfigs);
+		DeepCopy(Dlg.m_aoConfigs, App.m_aoConfigs);
 
 		App.m_bCfgModified = true;
 

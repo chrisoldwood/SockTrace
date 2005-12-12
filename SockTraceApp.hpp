@@ -13,10 +13,10 @@
 #define SOCKTRACEAPP_HPP
 
 // Template shorthands.
-typedef TPtrArray<CSockConfig>     CSockConfigs;
-typedef TPtrArray<CTCPSvrSocket>   CTCPSvrSockets;
-typedef TPtrArray<CTCPSockPair>    CTCPCltSockets;
-typedef TPtrArray<CUDPSockPair>    CUDPSvrSockets;
+typedef std::vector<CSockConfig*>   CSockConfigs;
+typedef std::vector<CTCPSvrSocket*> CTCPSvrSockets;
+typedef std::vector<CTCPSockPair*>  CTCPCltSockets;
+typedef std::vector<CUDPSockPair*>  CUDPSvrSockets;
 typedef TMap<CSocket*, CSockPair*> CSocketMap;
 
 /******************************************************************************

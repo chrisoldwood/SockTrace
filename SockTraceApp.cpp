@@ -91,10 +91,10 @@ CSockTraceApp::CSockTraceApp()
 CSockTraceApp::~CSockTraceApp()
 {
 	// Cleanup arrays.
-	m_aoConfigs.DeleteAll();
-	m_aoTCPSvrSocks.DeleteAll();
-	m_aoTCPCltSocks.DeleteAll();
-	m_aoUDPSvrSocks.DeleteAll();
+	DeleteAll(m_aoConfigs);
+	DeleteAll(m_aoTCPSvrSocks);
+	DeleteAll(m_aoTCPCltSocks);
+	DeleteAll(m_aoUDPSvrSocks);
 }
 
 /******************************************************************************
@@ -223,7 +223,7 @@ void CSockTraceApp::OpenSockets()
 	CBusyCursor oCursor;
 
 	// Resolve all destination hostnames...
-	for (int i = 0; i < m_aoConfigs.Size(); ++i)
+	for (uint i = 0; i < m_aoConfigs.size(); ++i)
 	{
 		CSockConfig* pConfig = m_aoConfigs[i];
 
@@ -247,7 +247,7 @@ void CSockTraceApp::OpenSockets()
 	}
 
 	// Create all server sockets.
-	for (int i = 0; i < m_aoConfigs.Size(); ++i)
+	for (uint i = 0; i < m_aoConfigs.size(); ++i)
 	{
 		CSockConfig* pConfig = m_aoConfigs[i];
 
@@ -268,7 +268,7 @@ void CSockTraceApp::OpenSockets()
 				pTCPSvrSock->AddServerListener(this);
 
 				// Add to the collection.
-				m_aoTCPSvrSocks.Add(pTCPSvrSock);
+				m_aoTCPSvrSocks.push_back(pTCPSvrSock);
 			}
 			catch (CSocketException& e)
 			{
@@ -294,7 +294,7 @@ void CSockTraceApp::OpenSockets()
 			pUDPSocks->m_oOutSocket.Listen(pConfig->m_nSrcPort+1);
 
 			// Add to the collection.
-			m_aoUDPSvrSocks.Add(pUDPSocks);
+			m_aoUDPSvrSocks.push_back(pUDPSocks);
 		}
 	}
 }
@@ -314,9 +314,9 @@ void CSockTraceApp::OpenSockets()
 void CSockTraceApp::CloseSockets()
 {
 	// Cleanup the sockets.
-	m_aoTCPSvrSocks.DeleteAll();
-	m_aoTCPCltSocks.DeleteAll();
-	m_aoUDPSvrSocks.DeleteAll();
+	DeleteAll(m_aoTCPSvrSocks);
+	DeleteAll(m_aoTCPCltSocks);
+	DeleteAll(m_aoUDPSvrSocks);
 }
 
 /******************************************************************************
@@ -470,7 +470,7 @@ void CSockTraceApp::LoadConfig()
 		pConfig->m_strSendFile = m_oIniFile.ReadString(strSection, "Send", strDefSendFile);
 		pConfig->m_strRecvFile = m_oIniFile.ReadString(strSection, "Recv", strDefRecvFile);
 
-		m_aoConfigs.Add(pConfig);
+		m_aoConfigs.push_back(pConfig);
 	}
 
 	// Read the trace settings.
@@ -511,9 +511,9 @@ void CSockTraceApp::SaveConfig()
 	// Write the socket settings.
 	if (m_bCfgModified)
 	{
-		m_oIniFile.WriteInt("Sockets", "Count", m_aoConfigs.Size());
+		m_oIniFile.WriteInt("Sockets", "Count", m_aoConfigs.size());
 
-		for (int i = 0; i < m_aoConfigs.Size(); ++i)
+		for (uint i = 0; i < m_aoConfigs.size(); ++i)
 		{
 			CString strSection, strEntry, strValue;
 
@@ -575,7 +575,7 @@ void CSockTraceApp::SaveConfig()
 CSockConfig* CSockTraceApp::FindConfig(int nType, uint nPort) const
 {
 	// For all configs...
-	for (int i = 0; i < m_aoConfigs.Size(); ++i)
+	for (uint i = 0; i < m_aoConfigs.size(); ++i)
 	{
 		CSockConfig* pConfig = m_aoConfigs[i];
 
@@ -636,7 +636,7 @@ void CSockTraceApp::OnAcceptReady(CTCPSvrSocket* pSvrSocket)
 			CTCPSockPair* pSockPair = new CTCPSockPair(pConfig, m_nInstance++, pInpSocket, pOutSocket);
 			
 			// Add socket pair to collection.
-			m_aoTCPCltSocks.Add(pSockPair);
+			m_aoTCPCltSocks.push_back(pSockPair);
 
 			// Add socket pair to map.
 			m_oSockMap.Add(pInpSocket, pSockPair);

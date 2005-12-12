@@ -28,7 +28,7 @@ public:
 	CSockCfgDlg();
 	
 	// Template shorthands.
-	typedef TArray<uint> CUIntArray;
+	typedef std::vector<uint> CUIntArray;
 
 	//
 	// Members.

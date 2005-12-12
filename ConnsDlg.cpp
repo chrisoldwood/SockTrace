@@ -71,7 +71,7 @@ void CConnsDlg::OnInitDialog()
 	m_lvSocks.InsertColumn(RECV,     "# Recv", 60, LVCFMT_LEFT);
 
 	// Add all TCP sockets...
-	for (int i = 0; i < App.m_aoTCPCltSocks.Size(); ++i)
+	for (uint i = 0; i < App.m_aoTCPCltSocks.size(); ++i)
 	{
 		CTCPSockPair* pPair = App.m_aoTCPCltSocks[i];
 
