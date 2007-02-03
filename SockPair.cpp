@@ -105,5 +105,5 @@ CPath CSockPair::ParseFileName(const char* pszFileName, const CParams& oParams)
 		strFileName.Insert(nStartChar, strValue);
 	}
 
-	return CPath::ApplicationDir() + strFileName;
+	return CPath::ApplicationDir() / strFileName;
 }
