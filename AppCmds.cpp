@@ -13,6 +13,7 @@
 #include "TraceOptsDlg.hpp"
 #include "SockOptsDlg.hpp"
 #include "AboutDlg.hpp"
+#include <Legacy/STLUtils.hpp>
 
 #ifdef _DEBUG
 // For memory leak detection.

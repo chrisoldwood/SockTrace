@@ -11,6 +11,7 @@
 #include "AppHeaders.hpp"
 #include "SockOptsDlg.hpp"
 #include "SockCfgDlg.hpp"
+#include <Legacy/STLUtils.hpp>
 
 #ifdef _DEBUG
 // For memory leak detection.
