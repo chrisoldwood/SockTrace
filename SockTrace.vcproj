@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.10"
 	Name="SockTrace"
-	ProjectGUID="{F2D13864-87C2-4b32-9CA9-F2A10A15EC0F}"
+	ProjectGUID="{F2D13864-87C2-4B32-9CA9-F2A10A15EC0F}"
 	SccProjectName="SAK"
 	SccAuxPath="SAK"
 	SccLocalPath="SAK"
@@ -24,12 +24,12 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				InlineFunctionExpansion="1"
+				InlineFunctionExpansion="0"
 				AdditionalIncludeDirectories="../Lib"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="TRUE"
+				EnableFunctionLevelLinking="FALSE"
 				ForceConformanceInForLoopScope="TRUE"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="2"
@@ -41,6 +41,7 @@
 				WarningLevel="4"
 				WarnAsError="TRUE"
 				SuppressStartupBanner="TRUE"
+				DebugInformationFormat="3"
 				CompileAs="0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
@@ -100,7 +101,7 @@
 				SmallerTypeCheck="TRUE"
 				RuntimeLibrary="1"
 				BufferSecurityCheck="TRUE"
-				EnableFunctionLevelLinking="TRUE"
+				EnableFunctionLevelLinking="FALSE"
 				ForceConformanceInForLoopScope="TRUE"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="2"
@@ -113,7 +114,7 @@
 				WarningLevel="4"
 				WarnAsError="TRUE"
 				SuppressStartupBanner="TRUE"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 				CompileAs="0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
@@ -158,6 +159,15 @@
 		</Configuration>
 	</Configurations>
 	<References>
+		<ProjectReference
+			ReferencedProjectIdentifier="{790BC113-52FB-4565-8968-79B8B011C520}"
+			Name="Core"/>
+		<ProjectReference
+			ReferencedProjectIdentifier="{FAB8D717-85EC-4896-B5DC-FDF0A0B67C92}"
+			Name="NCL"/>
+		<ProjectReference
+			ReferencedProjectIdentifier="{9B0335B6-93BE-4604-8497-27431874D758}"
+			Name="Wcl"/>
 	</References>
 	<Files>
 		<Filter
@@ -191,9 +201,6 @@
 				RelativePath="SockPair.cpp">
 			</File>
 			<File
-				RelativePath="SockTrace.rc">
-			</File>
-			<File
 				RelativePath="SockTraceApp.cpp">
 			</File>
 			<File
@@ -223,9 +230,6 @@
 			</File>
 			<File
 				RelativePath="Params.hpp">
-			</File>
-			<File
-				RelativePath="resource.h">
 			</File>
 			<File
 				RelativePath="SockCfgDlg.hpp">
@@ -260,6 +264,12 @@
 			</File>
 			<File
 				RelativePath="App.rcv">
+			</File>
+			<File
+				RelativePath="resource.h">
+			</File>
+			<File
+				RelativePath="SockTrace.rc">
 			</File>
 		</Filter>
 		<File
