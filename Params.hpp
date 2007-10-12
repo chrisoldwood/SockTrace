@@ -36,7 +36,7 @@ public:
 	
 protected:
 	// Template shorthands.
-	typedef TMap<CString, CString> CStrStrMap;
+	typedef std::map<CString, CString> CStrStrMap;
 
 	//
 	// Members.

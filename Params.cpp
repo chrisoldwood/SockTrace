@@ -45,7 +45,7 @@ CParams::CParams()
 
 CParams::~CParams()
 {
-	m_oParams.RemoveAll();
+	m_oParams.clear();
 }
 
 /******************************************************************************
@@ -63,10 +63,7 @@ CParams::~CParams()
 
 void CParams::Set(const CString& strParam, const CString& strValue)
 {
-	if (m_oParams.Exists(strParam))
-		m_oParams.Remove(strParam);
-
-	m_oParams.Add(strParam, strValue);
+	m_oParams[strParam] = strValue;
 }
 
 /******************************************************************************
@@ -83,9 +80,5 @@ void CParams::Set(const CString& strParam, const CString& strValue)
 
 CString CParams::Find(const CString& strParam) const
 {
-	CString strValue;
-
-	m_oParams.Find(strParam, strValue);
-
-	return strValue;
+	return m_oParams.find(strParam)->second;
 }
