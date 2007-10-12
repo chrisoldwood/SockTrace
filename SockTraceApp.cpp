@@ -9,6 +9,7 @@
 */
 
 #include "AppHeaders.hpp"
+#include <Legacy/STLUtils.hpp>
 
 #ifdef _DEBUG
 // For memory leak detection.
@@ -639,8 +640,8 @@ void CSockTraceApp::OnAcceptReady(CTCPSvrSocket* pSvrSocket)
 			m_aoTCPCltSocks.push_back(pSockPair);
 
 			// Add socket pair to map.
-			m_oSockMap.Add(pInpSocket, pSockPair);
-			m_oSockMap.Add(pOutSocket, pSockPair);
+			m_oSockMap.insert(std::make_pair(pInpSocket, pSockPair));
+			m_oSockMap.insert(std::make_pair(pOutSocket, pSockPair));
 		}
 	}
 	catch (CSocketException& e)
@@ -667,12 +668,12 @@ void CSockTraceApp::OnAcceptReady(CTCPSvrSocket* pSvrSocket)
 
 void CSockTraceApp::OnReadReady(CSocket* pSocket)
 {
-	CSockPair* pPair = NULL;
-
 	// Find the client <-> server pair.
-	m_oSockMap.Find(pSocket, pPair);
+	CSocketMap::const_iterator it = m_oSockMap.find(pSocket);
 
-	ASSERT(pPair != NULL);
+	ASSERT(it != m_oSockMap.end());
+
+	CSockPair* pPair = it->second;
 
 	try
 	{
@@ -806,10 +807,12 @@ void CSockTraceApp::OnReadReady(CSocket* pSocket)
 
 void CSockTraceApp::OnClosed(CSocket* pSocket, int /*nReason*/)
 {
-	CSockPair* pSockPair = NULL;
-
 	// Find the client <-> server pair.
-	m_oSockMap.Find(pSocket, pSockPair);
+	CSocketMap::const_iterator it = m_oSockMap.find(pSocket);
+
+	ASSERT(it != m_oSockMap.end());
+
+	CSockPair* pSockPair = it->second;
 
 	ASSERT(pSockPair != NULL);
 	ASSERT(pSockPair->m_pConfig->m_nType == SOCK_STREAM);
@@ -829,8 +832,8 @@ void CSockTraceApp::OnClosed(CSocket* pSocket, int /*nReason*/)
 	pTCPSockPair->m_pOutSocket->Close();
 
 	// Remove socket pair from map.
-	m_oSockMap.Remove(pTCPSockPair->m_pInpSocket);
-	m_oSockMap.Remove(pTCPSockPair->m_pOutSocket);
+	m_oSockMap.erase(m_oSockMap.find(pTCPSockPair->m_pInpSocket));
+	m_oSockMap.erase(m_oSockMap.find(pTCPSockPair->m_pOutSocket));
 }
 
 /******************************************************************************
@@ -849,10 +852,12 @@ void CSockTraceApp::OnClosed(CSocket* pSocket, int /*nReason*/)
 
 void CSockTraceApp::OnError(CSocket* pSocket, int nEvent, int nError)
 {
-	CSockPair* pSockPair = NULL;
-
 	// Find the client <-> server pair.
-	m_oSockMap.Find(pSocket, pSockPair);
+	CSocketMap::const_iterator it = m_oSockMap.find(pSocket);
+
+	ASSERT(it != m_oSockMap.end());
+
+	CSockPair* pSockPair = it->second;
 
 	ASSERT(pSockPair != NULL);
 

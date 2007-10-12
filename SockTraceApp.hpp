@@ -17,7 +17,7 @@ typedef std::vector<CSockConfig*>   CSockConfigs;
 typedef std::vector<CTCPSvrSocket*> CTCPSvrSockets;
 typedef std::vector<CTCPSockPair*>  CTCPCltSockets;
 typedef std::vector<CUDPSockPair*>  CUDPSvrSockets;
-typedef TMap<CSocket*, CSockPair*> CSocketMap;
+typedef std::map<CSocket*, CSockPair*> CSocketMap;
 
 /******************************************************************************
 ** 
