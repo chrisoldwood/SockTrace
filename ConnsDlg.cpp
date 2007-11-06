@@ -8,13 +8,12 @@
 *******************************************************************************
 */
 
-#include "AppHeaders.hpp"
+#include "Common.hpp"
 #include "ConnsDlg.hpp"
-
-#ifdef _DEBUG
-// For memory leak detection.
-#define new DBGCRT_NEW
-#endif
+#include "SockTraceApp.hpp"
+#include <WCL/StrCvt.hpp>
+#include "TCPSockPair.hpp"
+#include "SockConfig.hpp"
 
 /******************************************************************************
 ** Method:		Default constructor.

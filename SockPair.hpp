@@ -12,6 +12,16 @@
 #ifndef SOCKPAIR_HPP
 #define SOCKPAIR_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
+#include <WCL/Path.hpp>
+
+// Forward declarations.
+class CSockConfig;
+class CParams;
+
 /******************************************************************************
 ** 
 ** The base class for a pair of sockets.

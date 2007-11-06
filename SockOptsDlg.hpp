@@ -12,6 +12,13 @@
 #ifndef SOCKOPTSDLG_HPP
 #define SOCKOPTSDLG_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
+#include <WCL/CommonUI.hpp>
+#include "SockConfig.hpp"
+
 /******************************************************************************
 ** 
 ** The dialog used to configure the sockets to trace.

@@ -12,6 +12,16 @@
 #ifndef TCPSOCKPAIR_HPP
 #define TCPSOCKPAIR_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
+#include "SockPair.hpp"
+#include <NCL/TCPCltSocket.hpp>
+
+// Forward declarations.
+class CSockConfig;
+
 /******************************************************************************
 ** 
 ** The pair of sockets used to proxy a TCP client/server connection.

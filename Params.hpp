@@ -12,6 +12,10 @@
 #ifndef PARAMS_HPP
 #define PARAMS_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
 /******************************************************************************
 ** 
 ** The collection of parameters used when parsing a log filename.

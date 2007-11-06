@@ -8,13 +8,21 @@
 *******************************************************************************
 */
 
-#include "AppHeaders.hpp"
+#include "Common.hpp"
+#include "SockTraceApp.hpp"
 #include <Legacy/STLUtils.hpp>
-
-#ifdef _DEBUG
-// For memory leak detection.
-#define new DBGCRT_NEW
-#endif
+#include <WCL/File.hpp>
+#include <WCL/FileException.hpp>
+#include <NCL/WinSock.hpp>
+#include <WCL/BusyCursor.hpp>
+#include "SockConfig.hpp"
+#include <NCL/Socket.hpp>
+#include <NCL/SocketException.hpp>
+#include <NCL/TCPSvrSocket.hpp>
+#include <NCL/TCPCltSocket.hpp>
+#include "TCPSockPair.hpp"
+#include "UDPSockPair.hpp"
+#include <WCL/DateTime.hpp>
 
 /******************************************************************************
 **

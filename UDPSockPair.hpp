@@ -12,6 +12,13 @@
 #ifndef UDPSOCKPAIR_HPP
 #define UDPSOCKPAIR_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
+#include "SockPair.hpp"
+#include <NCL/UDPSvrSocket.hpp>
+
 /******************************************************************************
 ** 
 ** The pair of sockets used to proxy a UDP client/server connection.

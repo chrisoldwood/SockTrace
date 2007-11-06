@@ -8,12 +8,9 @@
 *******************************************************************************
 */
 
-#include "AppHeaders.hpp"
-
-#ifdef _DEBUG
-// For memory leak detection.
-#define new DBGCRT_NEW
-#endif
+#include "Common.hpp"
+#include "AppWnd.hpp"
+#include "SockTraceApp.hpp"
 
 /******************************************************************************
 **

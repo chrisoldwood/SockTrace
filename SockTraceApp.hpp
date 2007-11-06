@@ -12,8 +12,27 @@
 #ifndef SOCKTRACEAPP_HPP
 #define SOCKTRACEAPP_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
+#include <WCL/App.hpp>
+#include "AppWnd.hpp"
+#include "AppCmds.hpp"
+#include <WCL/IniFile.hpp>
+#include <NCL/IClientSocketListener.hpp>
+#include <NCL/IServerSocketListener.hpp>
+#include "SockConfig.hpp"
+
+// Forward declarations.
+class CSockConfig;
+class CTCPSvrSocket;
+class CTCPSockPair;
+class CUDPSockPair;
+class CSocket;
+class CSockPair;
+
 // Template shorthands.
-typedef std::vector<CSockConfig*>   CSockConfigs;
 typedef std::vector<CTCPSvrSocket*> CTCPSvrSockets;
 typedef std::vector<CTCPSockPair*>  CTCPCltSockets;
 typedef std::vector<CUDPSockPair*>  CUDPSvrSockets;

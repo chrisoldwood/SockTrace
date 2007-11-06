@@ -8,12 +8,11 @@
 *******************************************************************************
 */
 
-#include "AppHeaders.hpp"
-
-#ifdef _DEBUG
-// For memory leak detection.
-#define new DBGCRT_NEW
-#endif
+#include "Common.hpp"
+#include "SockPair.hpp"
+#include "Params.hpp"
+#include "SockConfig.hpp"
+#include <WCL/StrCvt.hpp>
 
 /******************************************************************************
 ** Method:		Constructor.

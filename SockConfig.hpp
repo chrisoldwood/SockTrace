@@ -12,6 +12,10 @@
 #ifndef SOCKCONFIG_HPP
 #define SOCKCONFIG_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
 /******************************************************************************
 ** 
 ** The data class used to store a socket trace configuration.
@@ -35,11 +39,7 @@ public:
 	CString	m_strRecvFile;		// The Receive log filename.
 };
 
-/******************************************************************************
-**
-** Implementation of inline functions.
-**
-*******************************************************************************
-*/
+// Template shorthands.
+typedef std::vector<CSockConfig*> CSockConfigs;
 
 #endif // SOCKCONFIG_HPP

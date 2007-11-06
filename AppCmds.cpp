@@ -8,17 +8,15 @@
 *******************************************************************************
 */
 
-#include "AppHeaders.hpp"
+#include "Common.hpp"
+#include "AppCmds.hpp"
+#include "SockTraceApp.hpp"
 #include "ConnsDlg.hpp"
 #include "TraceOptsDlg.hpp"
 #include "SockOptsDlg.hpp"
 #include "AboutDlg.hpp"
 #include <Legacy/STLUtils.hpp>
-
-#ifdef _DEBUG
-// For memory leak detection.
-#define new DBGCRT_NEW
-#endif
+#include "TCPSockPair.hpp"
 
 /******************************************************************************
 ** Method:		Constructor.
