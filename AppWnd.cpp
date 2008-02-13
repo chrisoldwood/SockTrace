@@ -19,7 +19,7 @@
 *******************************************************************************
 */
 
-const char* CAppWnd::WNDCLASS_NAME = "SockTrace";
+const tchar* CAppWnd::WNDCLASS_NAME = TXT("SockTrace");
 
 /******************************************************************************
 ** Method:		Default constructor.

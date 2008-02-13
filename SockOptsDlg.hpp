@@ -70,8 +70,8 @@ protected:
 	//
 	// Internal methods.
 	//
-	CSockConfig* ItemConfig(int nItem);
-	void         UpdateConfig(int nItem, CSockConfig* pConfig);
+	CSockConfig* ItemConfig(size_t nItem);
+	void         UpdateConfig(size_t nItem, CSockConfig* pConfig);
 };
 
 /******************************************************************************
@@ -81,9 +81,9 @@ protected:
 *******************************************************************************
 */
 
-inline CSockConfig* CSockOptsDlg::ItemConfig(int nItem)
+inline CSockConfig* CSockOptsDlg::ItemConfig(size_t nItem)
 {
-	ASSERT((nItem >= 0) && (nItem < m_lvSocks.ItemCount()));
+	ASSERT(nItem < m_lvSocks.ItemCount());
 
 	return static_cast<CSockConfig*>(m_lvSocks.ItemPtr(nItem));
 }

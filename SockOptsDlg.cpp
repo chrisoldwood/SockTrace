@@ -77,17 +77,17 @@ void CSockOptsDlg::OnInitDialog()
 	m_lvSocks.FullRowSelect(true);
 
 	// Create listview columns.
-	m_lvSocks.InsertColumn(SRC_PORT,     "Local Port",   75, LVCFMT_LEFT);
-	m_lvSocks.InsertColumn(SRC_PROTOCOL, "Protocol",     75, LVCFMT_LEFT);
-	m_lvSocks.InsertColumn(DST_HOST,     "Destination", 175, LVCFMT_LEFT);
-	m_lvSocks.InsertColumn(DST_PORT,     "Remote Port",  75, LVCFMT_LEFT);
+	m_lvSocks.InsertColumn(SRC_PORT,     TXT("Local Port"),   75, LVCFMT_LEFT);
+	m_lvSocks.InsertColumn(SRC_PROTOCOL, TXT("Protocol"),     75, LVCFMT_LEFT);
+	m_lvSocks.InsertColumn(DST_HOST,     TXT("Destination"), 175, LVCFMT_LEFT);
+	m_lvSocks.InsertColumn(DST_PORT,     TXT("Remote Port"),  75, LVCFMT_LEFT);
 
 	// Add current socket configs.
 	for (uint i = 0; i < m_aoConfigs.size(); ++i)
 	{
 		CSockConfig* pConfig = m_aoConfigs[i];
 
-		m_lvSocks.InsertItem(i, "");
+		m_lvSocks.InsertItem(i, TXT(""));
 		m_lvSocks.ItemPtr(i, pConfig);
 
 		UpdateConfig(i, pConfig);
@@ -155,7 +155,7 @@ void CSockOptsDlg::OnAdd()
 		// Add config to view.
 		int i = m_lvSocks.ItemCount();
 
-		m_lvSocks.InsertItem(i, "");
+		m_lvSocks.InsertItem(i, TXT(""));
 		m_lvSocks.ItemPtr(i, pConfig);
 
 		UpdateConfig(i, pConfig);
@@ -233,7 +233,7 @@ void CSockOptsDlg::OnEdit()
 
 void CSockOptsDlg::OnRemove()
 {
-	int nSel = m_lvSocks.Selection();
+	size_t nSel = m_lvSocks.Selection();
 
 	// Ignore, if no selection.
 	if (nSel == LB_ERR)
@@ -264,7 +264,7 @@ void CSockOptsDlg::OnRemove()
 *******************************************************************************
 */
 
-void CSockOptsDlg::UpdateConfig(int nItem, CSockConfig* pConfig)
+void CSockOptsDlg::UpdateConfig(size_t nItem, CSockConfig* pConfig)
 {
 	m_lvSocks.ItemText(nItem, SRC_PORT,     CStrCvt::FormatInt(pConfig->m_nSrcPort));
 	m_lvSocks.ItemText(nItem, SRC_PROTOCOL, pConfig->m_strType);

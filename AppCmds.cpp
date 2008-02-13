@@ -17,6 +17,7 @@
 #include "AboutDlg.hpp"
 #include <Legacy/STLUtils.hpp>
 #include "TCPSockPair.hpp"
+#include <Core/AnsiWide.hpp>
 
 /******************************************************************************
 ** Method:		Constructor.
@@ -134,18 +135,18 @@ void CAppCmds::OnViewClearTrace()
 void CAppCmds::OnToolsEditHosts()
 {
 	// Get the full path to the HOSTS file.
-	CPath   strHOSTS(CPath::SystemDir(), "drivers\\etc\\HOSTS");
+	CPath   strHOSTS(CPath::SystemDir(), TXT("drivers\\etc\\HOSTS"));
 
-	CString strCmdLine("NOTEPAD.EXE ");
+	CString strCmdLine(TXT("NOTEPAD.EXE "));
 
 	strCmdLine += strHOSTS;
 
 	// Launch NotePad to edit the file.
-	uint nResult = ::WinExec(strCmdLine, SW_SHOW);
+	uint nResult = ::WinExec(T2A(strCmdLine), SW_SHOW);
 
 	// Report any error.
 	if (nResult <= 31)
-		App.AlertMsg("Failed to execute:\n\n%s\n\nError code: %d", strCmdLine, nResult);
+		App.AlertMsg(TXT("Failed to execute:\n\n%s\n\nError code: %d"), strCmdLine, nResult);
 }
 
 /******************************************************************************
@@ -208,9 +209,9 @@ void CAppCmds::OnOptionsSocket()
 			bOpen = true;
 	}
 
-	const char* pszMsg = "WARNING: There are open connections.\n"
-						 "Any changes will cause these to be dropped.\n\n"
-						 "Do you want to continue?";
+	const tchar* pszMsg = TXT("WARNING: There are open connections.\n")
+						  TXT("Any changes will cause these to be dropped.\n\n")
+						  TXT("Do you want to continue?");
 
 	// Query user to continue.
 	if ( (bOpen) && (App.QueryMsg(pszMsg) != IDYES) )

@@ -52,7 +52,7 @@ private:
 	//
 	// Internal methods.
 	//
-	CPath ParseFileName(const char* pszFileName, const CParams& oParams); 
+	CPath ParseFileName(const tchar* pszFileName, const CParams& oParams); 
 };
 
 /******************************************************************************

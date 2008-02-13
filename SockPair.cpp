@@ -37,15 +37,15 @@ CSockPair::CSockPair(CSockConfig* pConfig, uint nInstance)
 	CParams oParams;
 
 	// Set the common parameters.
-	oParams.Set("port", CStrCvt::FormatInt(pConfig->m_nSrcPort));
-	oParams.Set("id",   CStrCvt::FormatInt(m_nInstance));
+	oParams.Set(TXT("port"), CStrCvt::FormatInt(pConfig->m_nSrcPort));
+	oParams.Set(TXT("id"),   CStrCvt::FormatInt(m_nInstance));
 
-	oParams.Set("dir", "sent");
+	oParams.Set(TXT("dir"), TXT("sent"));
 
 	// Create the sent data log file path.
 	m_strSendFile = ParseFileName(m_pConfig->m_strSendFile, oParams);
 
-	oParams.Set("dir", "recv");
+	oParams.Set(TXT("dir"), TXT("recv"));
 
 	// Create the sent data log file path.
 	m_strRecvFile = ParseFileName(m_pConfig->m_strRecvFile, oParams);
@@ -80,7 +80,7 @@ CSockPair::~CSockPair()
 *******************************************************************************
 */
 
-CPath CSockPair::ParseFileName(const char* pszFileName, const CParams& oParams)
+CPath CSockPair::ParseFileName(const tchar* pszFileName, const CParams& oParams)
 {
 	ASSERT(pszFileName != NULL);
 

@@ -79,7 +79,7 @@ public:
 	bool			m_bTraceConns;		// Trace connections?
 	bool			m_bTraceData;		// Trace data transfer?
 	bool			m_bTraceToWindow;	// Trace output to window?
-	int				m_nTraceLines;		// Trace lines in window.
+	uint			m_nTraceLines;		// Trace lines in window.
 	bool			m_bTraceToFile;		// Trace output to file?
 	CString			m_strTraceFile;		// Trace filename.
 
@@ -91,13 +91,13 @@ public:
 	void OpenSockets();
 	void CloseSockets();
 
-	void Trace(const char* pszMsg, ...);
+	void Trace(const tchar* pszMsg, ...);
 	void LogData(CPath& strFileName, const void* pvData, uint nLength);
 
 	//
 	// Constants.
 	//
-	static const char* VERSION;
+	static const tchar* VERSION;
 
 protected:
 	//
@@ -120,7 +120,7 @@ protected:
 	//
 	// Constants.
 	//
-	static const char* INI_FILE_VER;
+	static const tchar* INI_FILE_VER;
 
 	static const bool  DEF_TRAY_ICON;
 	static const bool  DEF_MIN_TO_TRAY;
@@ -129,7 +129,7 @@ protected:
 	static const bool  DEF_TRACE_TO_WINDOW;
 	static const int   DEF_TRACE_LINES;
 	static const bool  DEF_TRACE_TO_FILE;
-	static const char* DEF_TRACE_FILE;
+	static const tchar* DEF_TRACE_FILE;
 
 	//
 	// Socket event handlers.

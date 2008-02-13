@@ -61,13 +61,13 @@ void CConnsDlg::OnInitDialog()
 	m_lvSocks.FullRowSelect(true);
 
 	// Create listview columns.
-	m_lvSocks.InsertColumn(INSTANCE, "Conn",   50, LVCFMT_LEFT);
-	m_lvSocks.InsertColumn(STATUS,   "Status", 50, LVCFMT_LEFT);
-	m_lvSocks.InsertColumn(PROTOCOL, "Proto",  50, LVCFMT_LEFT);
-	m_lvSocks.InsertColumn(HOST,     "Host",  150, LVCFMT_LEFT);
-	m_lvSocks.InsertColumn(PORT,     "Port",   50, LVCFMT_LEFT);
-	m_lvSocks.InsertColumn(SENT,     "# Sent", 60, LVCFMT_LEFT);
-	m_lvSocks.InsertColumn(RECV,     "# Recv", 60, LVCFMT_LEFT);
+	m_lvSocks.InsertColumn(INSTANCE, TXT("Conn"),   50, LVCFMT_LEFT);
+	m_lvSocks.InsertColumn(STATUS,   TXT("Status"), 50, LVCFMT_LEFT);
+	m_lvSocks.InsertColumn(PROTOCOL, TXT("Proto"),  50, LVCFMT_LEFT);
+	m_lvSocks.InsertColumn(HOST,     TXT("Host"),  150, LVCFMT_LEFT);
+	m_lvSocks.InsertColumn(PORT,     TXT("Port"),   50, LVCFMT_LEFT);
+	m_lvSocks.InsertColumn(SENT,     TXT("# Sent"), 60, LVCFMT_LEFT);
+	m_lvSocks.InsertColumn(RECV,     TXT("# Recv"), 60, LVCFMT_LEFT);
 
 	// Add all TCP sockets...
 	for (uint i = 0; i < App.m_aoTCPCltSocks.size(); ++i)
@@ -79,7 +79,7 @@ void CConnsDlg::OnInitDialog()
 		bool bOpen = (pPair->m_pInpSocket->IsOpen() && pPair->m_pOutSocket->IsOpen());
 
 		m_lvSocks.InsertItem(i,           strConn);
-		m_lvSocks.ItemText  (i, STATUS,   (bOpen) ? "Open" : "Closed");
+		m_lvSocks.ItemText  (i, STATUS,   (bOpen) ? TXT("Open") : TXT("Closed"));
 		m_lvSocks.ItemText  (i, PROTOCOL, pPair->m_pConfig->m_strType);
 		m_lvSocks.ItemText  (i, HOST,     pPair->m_pConfig->m_strDstHost);
 		m_lvSocks.ItemText  (i, PORT,     CStrCvt::FormatInt(pPair->m_pConfig->m_nDstPort));

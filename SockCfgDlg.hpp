@@ -66,7 +66,7 @@ protected:
 	//
 	// Internal methods.
 	//
-	bool Validate(CEditBox& oEditBox, const char* pszSetting);
+	bool Validate(CEditBox& oEditBox, const tchar* pszSetting);
 };
 
 /******************************************************************************

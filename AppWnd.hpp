@@ -48,7 +48,7 @@ public:
 	//
 	// Constants.
 	//
-	static const char* WNDCLASS_NAME;
+	static const tchar* WNDCLASS_NAME;
 
 protected:
 	//

@@ -79,7 +79,7 @@ bool CTraceOptsDlg::OnOk()
 {
 	if ( (m_ckTraceToFile.IsChecked()) && (m_ebTraceFile.TextLength() == 0) )
 	{
-		AlertMsg("Please supply the trace filename.");
+		AlertMsg(TXT("Please supply the trace filename."));
 		m_ebTraceFile.Focus();
 		return false;
 	}
@@ -88,7 +88,7 @@ bool CTraceOptsDlg::OnOk()
 	App.m_bTraceConns    = m_ckTraceConns.IsChecked();
 	App.m_bTraceData     = m_ckTraceData.IsChecked();
 	App.m_bTraceToWindow = m_ckTraceToWindow.IsChecked();
-	App.m_nTraceLines    = atoi(m_ebTraceLines.Text());
+	App.m_nTraceLines    = CStrCvt::ParseUInt(m_ebTraceLines.Text());
 	App.m_bTraceToFile   = m_ckTraceToFile.IsChecked();
 	App.m_strTraceFile   = m_ebTraceFile.Text();
 

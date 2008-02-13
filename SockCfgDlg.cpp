@@ -61,11 +61,11 @@ CSockCfgDlg::CSockCfgDlg()
 void CSockCfgDlg::OnInitDialog()
 {
 	// Load protocol combo;
-	m_cbProtocol.Add("TCP");
-	m_cbProtocol.Add("UDP");
+	m_cbProtocol.Add(TXT("TCP"));
+	m_cbProtocol.Add(TXT("UDP"));
 
 	// If editing load current config.
-	if (m_oConfig.m_strType != "")
+	if (m_oConfig.m_strType != TXT(""))
 	{
 		m_cbProtocol.CurSel(m_cbProtocol.FindExact(m_oConfig.m_strType));
 		m_ebSrcPort.IntValue(m_oConfig.m_nSrcPort);
@@ -77,9 +77,9 @@ void CSockCfgDlg::OnInitDialog()
 	// Creating, load defaults.
 	else
 	{
-		m_cbProtocol.CurSel(m_cbProtocol.FindExact("TCP"));
-		m_ebSendFile.Text("%port%_%id%_%dir%.dat");
-		m_ebRecvFile.Text("%port%_%id%_%dir%.dat");
+		m_cbProtocol.CurSel(m_cbProtocol.FindExact(TXT("TCP")));
+		m_ebSendFile.Text(TXT("%port%_%id%_%dir%.dat"));
+		m_ebRecvFile.Text(TXT("%port%_%id%_%dir%.dat"));
 	}
 }
 
@@ -98,19 +98,19 @@ void CSockCfgDlg::OnInitDialog()
 bool CSockCfgDlg::OnOk()
 {
 	// Validate setings.
-	if (!Validate(m_ebSrcPort, "Source Port"))
+	if (!Validate(m_ebSrcPort, TXT("Source Port")))
 		return false;
 
-	if (!Validate(m_ebDstHost, "Destination Host"))
+	if (!Validate(m_ebDstHost, TXT("Destination Host")))
 		return false;
 
-	if (!Validate(m_ebDstPort, "Destination Port"))
+	if (!Validate(m_ebDstPort, TXT("Destination Port")))
 		return false;
 
-	if (!Validate(m_ebSendFile, "Send Filename"))
+	if (!Validate(m_ebSendFile, TXT("Send Filename")))
 		return false;
 
-	if (!Validate(m_ebRecvFile, "Receive Filename"))
+	if (!Validate(m_ebRecvFile, TXT("Receive Filename")))
 		return false;
 
 	// Extract new settings.
@@ -122,13 +122,13 @@ bool CSockCfgDlg::OnOk()
 	m_oConfig.m_strRecvFile = m_ebRecvFile.Text();
 
 	// Get protocol type.
-	m_oConfig.m_nType = (m_oConfig.m_strType == "TCP") ? SOCK_STREAM : SOCK_DGRAM;
+	m_oConfig.m_nType = (m_oConfig.m_strType == TXT("TCP")) ? SOCK_STREAM : SOCK_DGRAM;
 
 	// Port already in use?
 	if ( ((m_oConfig.m_nType == SOCK_STREAM) && (FindIndexOf(m_anTCPPorts, m_oConfig.m_nSrcPort) != -1))
 	  || ((m_oConfig.m_nType == SOCK_DGRAM ) && (FindIndexOf(m_anUDPPorts, m_oConfig.m_nSrcPort) != -1)) )
 	{
-		AlertMsg("The local port '%d' has already been used.", m_oConfig.m_nSrcPort);
+		AlertMsg(TXT("The local port '%d' has already been used."), m_oConfig.m_nSrcPort);
 		m_ebSrcPort.Focus();
 		return false;
 	}
@@ -165,7 +165,7 @@ void CSockCfgDlg::OnResolveHost()
 	}
 	catch (CSocketException& /*e*/)
 	{
-		AlertMsg("Failed to resolve: %s", strHost);
+		AlertMsg(TXT("Failed to resolve: %s"), strHost);
 	}
 }
 
@@ -182,14 +182,14 @@ void CSockCfgDlg::OnResolveHost()
 *******************************************************************************
 */
 
-bool CSockCfgDlg::Validate(CEditBox& oEditBox, const char* pszSetting)
+bool CSockCfgDlg::Validate(CEditBox& oEditBox, const tchar* pszSetting)
 {
 	ASSERT(pszSetting != NULL);
 
 	// Edit box empty?
 	if (oEditBox.TextLength() == 0)
 	{
-		AlertMsg("Please enter the %s.", pszSetting);
+		AlertMsg(TXT("Please enter the %s."), pszSetting);
 		oEditBox.Focus();
 		return false;
 	}

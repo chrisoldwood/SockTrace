@@ -23,6 +23,7 @@
 #include "TCPSockPair.hpp"
 #include "UDPSockPair.hpp"
 #include <WCL/DateTime.hpp>
+#include <Core/AnsiWide.hpp>
 
 /******************************************************************************
 **
@@ -42,12 +43,12 @@ CSockTraceApp App;
 */
 
 #ifdef _DEBUG
-const char* CSockTraceApp::VERSION      = "v1.6 Beta [Debug]";
+const tchar* CSockTraceApp::VERSION = TXT("v1.6 Beta [Debug]");
 #else
-const char* CSockTraceApp::VERSION      = "v1.6 Beta";
+const tchar* CSockTraceApp::VERSION = TXT("v1.6 Beta");
 #endif
 
-const char* CSockTraceApp::INI_FILE_VER  = "1.0";
+const tchar* CSockTraceApp::INI_FILE_VER = TXT("1.0");
 
 const bool  CSockTraceApp::DEF_TRAY_ICON       = false;
 const bool  CSockTraceApp::DEF_MIN_TO_TRAY     = false;
@@ -56,7 +57,7 @@ const bool  CSockTraceApp::DEF_TRACE_DATA      = false;
 const bool  CSockTraceApp::DEF_TRACE_TO_WINDOW = true;
 const int   CSockTraceApp::DEF_TRACE_LINES     = 100;
 const bool  CSockTraceApp::DEF_TRACE_TO_FILE   = false;
-const char* CSockTraceApp::DEF_TRACE_FILE      = "SockTrace.log";
+const tchar* CSockTraceApp::DEF_TRACE_FILE     = TXT("SockTrace.log");
 
 /******************************************************************************
 ** Method:		Constructor
@@ -136,7 +137,7 @@ bool CSockTraceApp::OnOpen()
 	}
 
 	// Set the app title.
-	m_strTitle = "Socket Trace";
+	m_strTitle = TXT("Socket Trace");
 
 	// Load settings.
 	LoadConfig();
@@ -157,7 +158,7 @@ bool CSockTraceApp::OnOpen()
 	}
 	catch (CFileException& e)
 	{
-		AlertMsg("Failed to truncate the log file:\n\n%s", e.ErrorText());
+		AlertMsg(TXT("Failed to truncate the log file:\n\n%s"), e.ErrorText());
 		return false;
 	}
 
@@ -179,7 +180,7 @@ bool CSockTraceApp::OnOpen()
 
 	if (nResult != 0)
 	{
-		FatalMsg("Failed to initialise WinSock layer: %d.", nResult);
+		FatalMsg(TXT("Failed to initialise WinSock layer: %d."), nResult);
 		return false;
 	}
 
@@ -246,12 +247,12 @@ void CSockTraceApp::OpenSockets()
 			{
 				pConfig->m_strDstAddr = CSocket::ResolveStr(pConfig->m_strDstHost);
 
-				Trace("Resolved hostname %s to %s", pConfig->m_strDstHost, pConfig->m_strDstAddr);
+				Trace(TXT("Resolved hostname %s to %s"), pConfig->m_strDstHost, pConfig->m_strDstAddr);
 			}
 		}
 		catch (CSocketException& e)
 		{
-			Trace("Failed to resolve hostname %s - %s", pConfig->m_strDstHost, CWinSock::ErrorToSymbol(e.m_nWSACode));
+			Trace(TXT("Failed to resolve hostname %s - %s"), pConfig->m_strDstHost, CWinSock::ErrorToSymbol(e.m_nWSACode));
 		}
 	}
 
@@ -268,7 +269,7 @@ void CSockTraceApp::OpenSockets()
 
 			try
 			{
-				Trace("Opening TCP local socket on port %d", pConfig->m_nSrcPort);
+				Trace(TXT("Opening TCP local socket on port %d"), pConfig->m_nSrcPort);
 
 				// Start listening...
 				pTCPSvrSock->Listen(pConfig->m_nSrcPort, 5);
@@ -281,7 +282,7 @@ void CSockTraceApp::OpenSockets()
 			}
 			catch (CSocketException& e)
 			{
-				Trace("Failed to create local socket on port %d - %s", pConfig->m_nSrcPort, e.ErrorText());
+				Trace(TXT("Failed to create local socket on port %d - %s"), pConfig->m_nSrcPort, e.ErrorText());
 
 				delete pTCPSvrSock;
 			}
@@ -289,13 +290,13 @@ void CSockTraceApp::OpenSockets()
 		// UDP socket?
 		else if (pConfig->m_nType == SOCK_DGRAM)
 		{
-			Trace("Opened UDP sockets on port %d connection %d ", pConfig->m_nSrcPort, m_nInstance);
+			Trace(TXT("Opened UDP sockets on port %d connection %d "), pConfig->m_nSrcPort, m_nInstance);
 
 			// Create the listening sockets.
 			CUDPSockPair* pUDPSocks = new CUDPSockPair(pConfig, m_nInstance++);
 
 			// Parse destination IP address.
-			pUDPSocks->m_oDstAddr.s_addr = inet_addr(pConfig->m_strDstAddr);
+			pUDPSocks->m_oDstAddr.s_addr = inet_addr(T2A(pConfig->m_strDstAddr));
 			pUDPSocks->m_nDstPort        = pConfig->m_nDstPort;
 
 			// Start listening...
@@ -341,7 +342,7 @@ void CSockTraceApp::CloseSockets()
 *******************************************************************************
 */
 
-void CSockTraceApp::Trace(const char* pszMsg, ...)
+void CSockTraceApp::Trace(const tchar* pszMsg, ...)
 {
 	// Ignore, if no output for trace.
 	if ((!m_bTraceToWindow) && (!m_bTraceToFile))
@@ -357,7 +358,7 @@ void CSockTraceApp::Trace(const char* pszMsg, ...)
 	strMsg.FormatEx(pszMsg, args);
 
 	// Prepend date and time.
-	strMsg = CDateTime::Current().ToString() + " " + strMsg;
+	strMsg = CDateTime::Current().ToString() + TXT(" ") + strMsg;
 
 	if (m_bTraceToWindow)
 	{
@@ -379,7 +380,7 @@ void CSockTraceApp::Trace(const char* pszMsg, ...)
 
 			// Write trace message to end of file.
 			fLogFile.Seek(0, FILE_END);
-			fLogFile.WriteLine(strMsg);
+			fLogFile.WriteLine(strMsg, ANSI_TEXT);
 
 			fLogFile.Close();
 		}
@@ -419,7 +420,7 @@ void CSockTraceApp::LogData(CPath& strFileName, const void* pvData, uint nLength
 	}
 	catch (CFileException& e)
 	{
-		AlertMsg("Failed to write to log file:\n\n%s", e.ErrorText());
+		AlertMsg(TXT("Failed to write to log file:\n\n%s"), e.ErrorText());
 	}
 }
 
@@ -438,66 +439,66 @@ void CSockTraceApp::LogData(CPath& strFileName, const void* pvData, uint nLength
 void CSockTraceApp::LoadConfig()
 {
 	// Read the file version.
-	CString strVer = m_oIniFile.ReadString("Version", "Version", INI_FILE_VER);
+	CString strVer = m_oIniFile.ReadString(TXT("Version"), TXT("Version"), INI_FILE_VER);
 
 	// Read the socket configurations.
-	int nConfigs = m_oIniFile.ReadInt("Sockets", "Count", 0);
+	int nConfigs = m_oIniFile.ReadInt(TXT("Sockets"), TXT("Count"), 0);
 
 	for (int i = 0; i < nConfigs; ++i)
 	{
 		CString strSection, strEntry;
 
-		strEntry.Format("Socket[%d]", i);
+		strEntry.Format(TXT("Socket[%d]"), i);
 
 		// Get the socket config section.
-		CString strPort = m_oIniFile.ReadString("Sockets", strEntry, "");
+		CString strPort = m_oIniFile.ReadString(TXT("Sockets"), strEntry, TXT(""));
 
 		if (strPort.Empty())
 			continue;
 
 		// Format section name.
-		strSection.Format("Port %s", strPort);
+		strSection.Format(TXT("Port %s"), strPort);
 
 		CSockConfig* pConfig = new CSockConfig;
 
 		// Read the socket settings.
-		pConfig->m_strType    = m_oIniFile.ReadString(strSection, "Type",    "TCP"      );
-		pConfig->m_nSrcPort   = m_oIniFile.ReadInt   (strSection, "SrcPort", 80         );
-		pConfig->m_strDstHost = m_oIniFile.ReadString(strSection, "DstHost", "localhost");
-		pConfig->m_nDstPort   = m_oIniFile.ReadInt   (strSection, "DstPort", 80         );
+		pConfig->m_strType    = m_oIniFile.ReadString(strSection, TXT("Type"),    TXT("TCP")      );
+		pConfig->m_nSrcPort   = m_oIniFile.ReadInt   (strSection, TXT("SrcPort"), 80         );
+		pConfig->m_strDstHost = m_oIniFile.ReadString(strSection, TXT("DstHost"), TXT("localhost"));
+		pConfig->m_nDstPort   = m_oIniFile.ReadInt   (strSection, TXT("DstPort"), 80         );
 
 		// Get the WinSock socket type.
-		pConfig->m_nType = (pConfig->m_strType == "TCP") ? SOCK_STREAM : SOCK_DGRAM;
+		pConfig->m_nType = (pConfig->m_strType == TXT("TCP")) ? SOCK_STREAM : SOCK_DGRAM;
 
 		CString strDefSendFile, strDefRecvFile;
 
 		// Format the default log filenames.
-		strDefSendFile.Format("Send_%d_%%d", pConfig->m_nSrcPort);
-		strDefRecvFile.Format("Recv_%d_%%d", pConfig->m_nSrcPort);
+		strDefSendFile.Format(TXT("Send_%d_%%d"), pConfig->m_nSrcPort);
+		strDefRecvFile.Format(TXT("Recv_%d_%%d"), pConfig->m_nSrcPort);
 
 		// Read the log filenames.
-		pConfig->m_strSendFile = m_oIniFile.ReadString(strSection, "Send", strDefSendFile);
-		pConfig->m_strRecvFile = m_oIniFile.ReadString(strSection, "Recv", strDefRecvFile);
+		pConfig->m_strSendFile = m_oIniFile.ReadString(strSection, TXT("Send"), strDefSendFile);
+		pConfig->m_strRecvFile = m_oIniFile.ReadString(strSection, TXT("Recv"), strDefRecvFile);
 
 		m_aoConfigs.push_back(pConfig);
 	}
 
 	// Read the trace settings.
-	m_bTraceConns    = m_oIniFile.ReadBool  ("Trace", "Connections", m_bTraceConns   );
-	m_bTraceData     = m_oIniFile.ReadBool  ("Trace", "DataFlow",    m_bTraceData    );
-	m_bTraceToWindow = m_oIniFile.ReadBool  ("Trace", "ToWindow",    m_bTraceToWindow);
-	m_nTraceLines    = m_oIniFile.ReadInt   ("Trace", "Lines",       m_nTraceLines   );
-	m_bTraceToFile   = m_oIniFile.ReadBool  ("Trace", "ToFile",      m_bTraceToFile  );
-	m_strTraceFile   = m_oIniFile.ReadString("Trace", "FileName",    m_strTraceFile  );
+	m_bTraceConns    = m_oIniFile.ReadBool  (TXT("Trace"), TXT("Connections"), m_bTraceConns   );
+	m_bTraceData     = m_oIniFile.ReadBool  (TXT("Trace"), TXT("DataFlow"),    m_bTraceData    );
+	m_bTraceToWindow = m_oIniFile.ReadBool  (TXT("Trace"), TXT("ToWindow"),    m_bTraceToWindow);
+	m_nTraceLines    = m_oIniFile.ReadInt   (TXT("Trace"), TXT("Lines"),       m_nTraceLines   );
+	m_bTraceToFile   = m_oIniFile.ReadBool  (TXT("Trace"), TXT("ToFile"),      m_bTraceToFile  );
+	m_strTraceFile   = m_oIniFile.ReadString(TXT("Trace"), TXT("FileName"),    m_strTraceFile  );
 
 	// Read the UI settings.
-	m_bTrayIcon  = m_oIniFile.ReadBool("UI", "TrayIcon",  m_bTrayIcon );
-	m_bMinToTray = m_oIniFile.ReadBool("UI", "MinToTray", m_bMinToTray);
+	m_bTrayIcon  = m_oIniFile.ReadBool(TXT("UI"), TXT("TrayIcon"),  m_bTrayIcon );
+	m_bMinToTray = m_oIniFile.ReadBool(TXT("UI"), TXT("MinToTray"), m_bMinToTray);
 
-	m_rcLastPos.left   = m_oIniFile.ReadInt("UI", "Left",   0);
-	m_rcLastPos.top    = m_oIniFile.ReadInt("UI", "Top",    0);
-	m_rcLastPos.right  = m_oIniFile.ReadInt("UI", "Right",  0);
-	m_rcLastPos.bottom = m_oIniFile.ReadInt("UI", "Bottom", 0);
+	m_rcLastPos.left   = m_oIniFile.ReadInt(TXT("UI"), TXT("Left"),   0);
+	m_rcLastPos.top    = m_oIniFile.ReadInt(TXT("UI"), TXT("Top"),    0);
+	m_rcLastPos.right  = m_oIniFile.ReadInt(TXT("UI"), TXT("Right"),  0);
+	m_rcLastPos.bottom = m_oIniFile.ReadInt(TXT("UI"), TXT("Bottom"), 0);
 }
 
 /******************************************************************************
@@ -515,12 +516,12 @@ void CSockTraceApp::LoadConfig()
 void CSockTraceApp::SaveConfig()
 {
 	// Write the file version.
-	m_oIniFile.WriteString("Version", "Version", INI_FILE_VER);
+	m_oIniFile.WriteString(TXT("Version"), TXT("Version"), INI_FILE_VER);
 
 	// Write the socket settings.
 	if (m_bCfgModified)
 	{
-		m_oIniFile.WriteInt("Sockets", "Count", m_aoConfigs.size());
+		m_oIniFile.WriteInt(TXT("Sockets"), TXT("Count"), m_aoConfigs.size());
 
 		for (uint i = 0; i < m_aoConfigs.size(); ++i)
 		{
@@ -528,44 +529,44 @@ void CSockTraceApp::SaveConfig()
 
 			CSockConfig* pConfig = m_aoConfigs[i];
 		
-			strEntry.Format("Socket[%d]", i);
-			strValue.Format("%d", pConfig->m_nSrcPort);
+			strEntry.Format(TXT("Socket[%d]"), i);
+			strValue.Format(TXT("%d"), pConfig->m_nSrcPort);
 
 			// Write the socket config section.
-			m_oIniFile.WriteString("Sockets", strEntry, strValue);
+			m_oIniFile.WriteString(TXT("Sockets"), strEntry, strValue);
 
 			// Format section name.
-			strSection.Format("Port %s", strValue);
+			strSection.Format(TXT("Port %s"), strValue);
 
 			// Write the socket settings.
-			m_oIniFile.WriteString(strSection, "Type",    pConfig->m_strType   );
-			m_oIniFile.WriteInt   (strSection, "SrcPort", pConfig->m_nSrcPort  );
-			m_oIniFile.WriteString(strSection, "DstHost", pConfig->m_strDstHost);
-			m_oIniFile.WriteInt   (strSection, "DstPort", pConfig->m_nDstPort  );
+			m_oIniFile.WriteString(strSection, TXT("Type"),    pConfig->m_strType   );
+			m_oIniFile.WriteInt   (strSection, TXT("SrcPort"), pConfig->m_nSrcPort  );
+			m_oIniFile.WriteString(strSection, TXT("DstHost"), pConfig->m_strDstHost);
+			m_oIniFile.WriteInt   (strSection, TXT("DstPort"), pConfig->m_nDstPort  );
 
 			// Read the log filenames.
-			m_oIniFile.WriteString(strSection, "Send", pConfig->m_strSendFile);
-			m_oIniFile.WriteString(strSection, "Recv", pConfig->m_strRecvFile);
+			m_oIniFile.WriteString(strSection, TXT("Send"), pConfig->m_strSendFile);
+			m_oIniFile.WriteString(strSection, TXT("Recv"), pConfig->m_strRecvFile);
 		}
 
 		// Write the trace settings.
-		m_oIniFile.WriteBool  ("Trace", "Connections", m_bTraceConns   );
-		m_oIniFile.WriteBool  ("Trace", "DataFlow",    m_bTraceData    );
-		m_oIniFile.WriteBool  ("Trace", "ToWindow",    m_bTraceToWindow);
-		m_oIniFile.WriteInt   ("Trace", "Lines",       m_nTraceLines   );
-		m_oIniFile.WriteBool  ("Trace", "ToFile",      m_bTraceToFile  );
-		m_oIniFile.WriteString("Trace", "FileName",    m_strTraceFile  );
+		m_oIniFile.WriteBool  (TXT("Trace"), TXT("Connections"), m_bTraceConns   );
+		m_oIniFile.WriteBool  (TXT("Trace"), TXT("DataFlow"),    m_bTraceData    );
+		m_oIniFile.WriteBool  (TXT("Trace"), TXT("ToWindow"),    m_bTraceToWindow);
+		m_oIniFile.WriteInt   (TXT("Trace"), TXT("Lines"),       m_nTraceLines   );
+		m_oIniFile.WriteBool  (TXT("Trace"), TXT("ToFile"),      m_bTraceToFile  );
+		m_oIniFile.WriteString(TXT("Trace"), TXT("FileName"),    m_strTraceFile  );
 
 		// Write the UI settings.
-		m_oIniFile.WriteBool("UI", "TrayIcon",  m_bTrayIcon );
-		m_oIniFile.WriteBool("UI", "MinToTray", m_bMinToTray);
+		m_oIniFile.WriteBool(TXT("UI"), TXT("TrayIcon"),  m_bTrayIcon );
+		m_oIniFile.WriteBool(TXT("UI"), TXT("MinToTray"), m_bMinToTray);
 	}
 
 	// Write the window pos and size.
-	m_oIniFile.WriteInt("UI", "Left",   m_rcLastPos.left  );
-	m_oIniFile.WriteInt("UI", "Top",    m_rcLastPos.top   );
-	m_oIniFile.WriteInt("UI", "Right",  m_rcLastPos.right );
-	m_oIniFile.WriteInt("UI", "Bottom", m_rcLastPos.bottom);
+	m_oIniFile.WriteInt(TXT("UI"), TXT("Left"),   m_rcLastPos.left  );
+	m_oIniFile.WriteInt(TXT("UI"), TXT("Top"),    m_rcLastPos.top   );
+	m_oIniFile.WriteInt(TXT("UI"), TXT("Right"),  m_rcLastPos.right );
+	m_oIniFile.WriteInt(TXT("UI"), TXT("Bottom"), m_rcLastPos.bottom);
 }
 
 /******************************************************************************
@@ -623,7 +624,7 @@ void CSockTraceApp::OnAcceptReady(CTCPSvrSocket* pSvrSocket)
 			ASSERT(pInpSocket != NULL);
 
 			if (App.m_bTraceConns)
-				Trace("Connection accepted from %s", pInpSocket->Host());
+				Trace(TXT("Connection accepted from %s"), pInpSocket->Host());
 
 			// Find the config for the server socket.
 			CSockConfig* pConfig = FindConfig(pSvrSocket->Type(), pSvrSocket->Port());
@@ -636,7 +637,7 @@ void CSockTraceApp::OnAcceptReady(CTCPSvrSocket* pSvrSocket)
 			pOutSocket->Connect(pConfig->m_strDstHost, pConfig->m_nDstPort);
 
 			if (App.m_bTraceConns)
-				Trace("Opened TCP connection %d to server %s:%d", m_nInstance, pOutSocket->Host(), pOutSocket->Port());
+				Trace(TXT("Opened TCP connection %d to server %s:%d"), m_nInstance, pOutSocket->Host(), pOutSocket->Port());
 
 			// Attach event handler.
 			pInpSocket->AddClientListener(this);
@@ -654,7 +655,7 @@ void CSockTraceApp::OnAcceptReady(CTCPSvrSocket* pSvrSocket)
 	}
 	catch (CSocketException& e)
 	{
-		Trace("Failed to accept client connection on port %d  - %s", pSvrSocket->Port(), e.ErrorText());
+		Trace(TXT("Failed to accept client connection on port %d  - %s"), pSvrSocket->Port(), e.ErrorText());
 
 		// Cleanup.
 		delete pInpSocket;
@@ -702,7 +703,7 @@ void CSockTraceApp::OnReadReady(CSocket* pSocket)
 				if ((nRead = pSockPair->m_pInpSocket->Recv(oBuffer)) > 0)
 				{
 					if (App.m_bTraceData)
-						Trace("Forwarded %d bytes to the server on connection %d", nRead, pSockPair->m_nInstance);
+						Trace(TXT("Forwarded %d bytes to the server on connection %d"), nRead, pSockPair->m_nInstance);
 
 					// Send down the server socket.
 					pSockPair->m_pOutSocket->Send(oBuffer.Buffer(), nRead);
@@ -725,7 +726,7 @@ void CSockTraceApp::OnReadReady(CSocket* pSocket)
 				if ((nRead = pSockPair->m_pOutSocket->Recv(oBuffer)) > 0)
 				{
 					if (App.m_bTraceData)
-						Trace("Returned %d bytes to the client on connection %d", nRead, pSockPair->m_nInstance);
+						Trace(TXT("Returned %d bytes to the client on connection %d"), nRead, pSockPair->m_nInstance);
 
 					// Send down the client socket.
 					pSockPair->m_pInpSocket->Send(oBuffer.Buffer(), nRead);
@@ -755,7 +756,7 @@ void CSockTraceApp::OnReadReady(CSocket* pSocket)
 				if ((nRead = pSockPair->m_oInpSocket.RecvFrom(oBuffer, pSockPair->m_oSrcAddr, pSockPair->m_nSrcPort)) > 0)
 				{
 					if (App.m_bTraceData)
-						Trace("Forwarded %d bytes to the server (%s:%d)", nRead, inet_ntoa(pSockPair->m_oSrcAddr), pSockPair->m_nSrcPort);
+						Trace(TXT("Forwarded %d bytes to the server (%s:%d)"), nRead, inet_ntoa(pSockPair->m_oSrcAddr), pSockPair->m_nSrcPort);
 
 					// Send down the server socket.
 					pSockPair->m_oOutSocket.SendTo(oBuffer.Buffer(), nRead, pSockPair->m_oDstAddr, pSockPair->m_nDstPort);
@@ -780,7 +781,7 @@ void CSockTraceApp::OnReadReady(CSocket* pSocket)
 				if ((nRead = pSockPair->m_oOutSocket.RecvFrom(oBuffer, oAddress, nPort)) > 0)
 				{
 					if (App.m_bTraceData)
-						Trace("Returned %d bytes to the client (%s:%d)", nRead, inet_ntoa(oAddress), nPort);
+						Trace(TXT("Returned %d bytes to the client (%s:%d)"), nRead, inet_ntoa(oAddress), nPort);
 
 					// Send down the client socket.
 					pSockPair->m_oInpSocket.SendTo(oBuffer.Buffer(), nRead, pSockPair->m_oSrcAddr, pSockPair->m_nSrcPort);
@@ -796,7 +797,7 @@ void CSockTraceApp::OnReadReady(CSocket* pSocket)
 	}
 	catch (CSocketException& e)
 	{
-		Trace("Failed to forward packets on connection %d - %s", pPair->m_nInstance, e.ErrorText());
+		Trace(TXT("Failed to forward packets on connection %d - %s"), pPair->m_nInstance, e.ErrorText());
 	}
 }
 
@@ -829,7 +830,7 @@ void CSockTraceApp::OnClosed(CSocket* pSocket, int /*nReason*/)
 	CTCPSockPair* pTCPSockPair = static_cast<CTCPSockPair*>(pSockPair);
 
 	if (App.m_bTraceConns)
-		Trace("Connection %d closed on port %d", pSockPair->m_nInstance, pSockPair->m_pConfig->m_nSrcPort);
+		Trace(TXT("Connection %d closed on port %d"), pSockPair->m_nInstance, pSockPair->m_pConfig->m_nSrcPort);
 
 	// Detach event handler.
 	pTCPSockPair->m_pInpSocket->RemoveClientListener(this);
@@ -869,5 +870,5 @@ void CSockTraceApp::OnError(CSocket* pSocket, int nEvent, int nError)
 
 	ASSERT(pSockPair != NULL);
 
-	Trace("%s Error on connection %d: %s", CSocket::AsyncEventStr(nEvent), pSockPair->m_nInstance, CWinSock::ErrorToSymbol(nError));
+	Trace(TXT("%s Error on connection %d: %s"), CSocket::AsyncEventStr(nEvent), pSockPair->m_nInstance, CWinSock::ErrorToSymbol(nError));
 }
