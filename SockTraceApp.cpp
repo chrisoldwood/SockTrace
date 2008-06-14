@@ -158,7 +158,7 @@ bool CSockTraceApp::OnOpen()
 	}
 	catch (CFileException& e)
 	{
-		AlertMsg(TXT("Failed to truncate the log file:\n\n%s"), e.ErrorText());
+		AlertMsg(TXT("Failed to truncate the log file:\n\n%s"), e.What());
 		return false;
 	}
 
@@ -282,7 +282,7 @@ void CSockTraceApp::OpenSockets()
 			}
 			catch (CSocketException& e)
 			{
-				Trace(TXT("Failed to create local socket on port %d - %s"), pConfig->m_nSrcPort, e.ErrorText());
+				Trace(TXT("Failed to create local socket on port %d - %s"), pConfig->m_nSrcPort, e.What());
 
 				delete pTCPSvrSock;
 			}
@@ -420,7 +420,7 @@ void CSockTraceApp::LogData(CPath& strFileName, const void* pvData, uint nLength
 	}
 	catch (CFileException& e)
 	{
-		AlertMsg(TXT("Failed to write to log file:\n\n%s"), e.ErrorText());
+		AlertMsg(TXT("Failed to write to log file:\n\n%s"), e.What());
 	}
 }
 
@@ -655,7 +655,7 @@ void CSockTraceApp::OnAcceptReady(CTCPSvrSocket* pSvrSocket)
 	}
 	catch (CSocketException& e)
 	{
-		Trace(TXT("Failed to accept client connection on port %d  - %s"), pSvrSocket->Port(), e.ErrorText());
+		Trace(TXT("Failed to accept client connection on port %d  - %s"), pSvrSocket->Port(), e.What());
 
 		// Cleanup.
 		delete pInpSocket;
@@ -797,7 +797,7 @@ void CSockTraceApp::OnReadReady(CSocket* pSocket)
 	}
 	catch (CSocketException& e)
 	{
-		Trace(TXT("Failed to forward packets on connection %d - %s"), pPair->m_nInstance, e.ErrorText());
+		Trace(TXT("Failed to forward packets on connection %d - %s"), pPair->m_nInstance, e.What());
 	}
 }
 
