@@ -10,10 +10,10 @@
 
 #include "Common.hpp"
 #include "SockCfgDlg.hpp"
-#include <Legacy/STLUtils.hpp>
 #include <WCL/BusyCursor.hpp>
 #include <NCL/Socket.hpp>
 #include <NCL/SocketException.hpp>
+#include <Core/Algorithm.hpp>
 
 /******************************************************************************
 ** Method:		Default constructor.
@@ -125,8 +125,8 @@ bool CSockCfgDlg::OnOk()
 	m_oConfig.m_nType = (m_oConfig.m_strType == TXT("TCP")) ? SOCK_STREAM : SOCK_DGRAM;
 
 	// Port already in use?
-	if ( ((m_oConfig.m_nType == SOCK_STREAM) && (FindIndexOf(m_anTCPPorts, m_oConfig.m_nSrcPort) != -1))
-	  || ((m_oConfig.m_nType == SOCK_DGRAM ) && (FindIndexOf(m_anUDPPorts, m_oConfig.m_nSrcPort) != -1)) )
+	if ( ((m_oConfig.m_nType == SOCK_STREAM) && Core::exists(m_anTCPPorts, m_oConfig.m_nSrcPort))
+	  || ((m_oConfig.m_nType == SOCK_DGRAM ) && Core::exists(m_anUDPPorts, m_oConfig.m_nSrcPort)) )
 	{
 		AlertMsg(TXT("The local port '%d' has already been used."), m_oConfig.m_nSrcPort);
 		m_ebSrcPort.Focus();

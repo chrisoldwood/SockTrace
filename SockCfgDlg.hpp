@@ -19,6 +19,9 @@
 #include <WCL/CommonUI.hpp>
 #include "SockConfig.hpp"
 
+// Template shorthands.
+typedef std::vector<uint> CUIntArray;
+
 /******************************************************************************
 ** 
 ** The dialog used to edit a socket configuration.
@@ -34,9 +37,6 @@ public:
 	//
 	CSockCfgDlg();
 	
-	// Template shorthands.
-	typedef std::vector<uint> CUIntArray;
-
 	//
 	// Members.
 	//
