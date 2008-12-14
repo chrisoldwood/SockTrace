@@ -42,6 +42,7 @@
 #define IDC_CONNECTIONS                 1096
 #define IDC_MAX_LINES                   1097
 #define IDC_FILE_NAME                   1098
+#define IDC_COPYRIGHT                   1098
 #define IDD_MAIN                        5000
 #define IDD_ABOUT                       5001
 #define IDD_SOCK_OPTIONS                5002
@@ -56,7 +57,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        135
 #define _APS_NEXT_COMMAND_VALUE         169
-#define _APS_NEXT_CONTROL_VALUE         1098
+#define _APS_NEXT_CONTROL_VALUE         1099
 #define _APS_NEXT_SYMED_VALUE           104
 #endif
 #endif
