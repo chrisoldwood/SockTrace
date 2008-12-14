@@ -11,8 +11,8 @@
 #include "Common.hpp"
 #include "SockOptsDlg.hpp"
 #include "SockCfgDlg.hpp"
-#include <Legacy/STLUtils.hpp>
 #include <WCL/StrCvt.hpp>
+#include <algorithm>
 
 /******************************************************************************
 ** Method:		Default constructor.
@@ -56,7 +56,6 @@ CSockOptsDlg::CSockOptsDlg()
 
 CSockOptsDlg::~CSockOptsDlg()
 {
-	DeleteAll(m_aoConfigs);
 }
 
 /******************************************************************************
@@ -85,12 +84,12 @@ void CSockOptsDlg::OnInitDialog()
 	// Add current socket configs.
 	for (uint i = 0; i < m_aoConfigs.size(); ++i)
 	{
-		CSockConfig* pConfig = m_aoConfigs[i];
+		CSockConfigPtr pConfig = m_aoConfigs[i];
 
 		m_lvSocks.InsertItem(i, TXT(""));
-		m_lvSocks.ItemPtr(i, pConfig);
+		m_lvSocks.ItemPtr(i, pConfig.Get());
 
-		UpdateConfig(i, pConfig);
+		UpdateConfig(i, pConfig.Get());
 	}
 
 	// Select 1st by default.
@@ -134,7 +133,7 @@ void CSockOptsDlg::OnAdd()
 	// Set ports in use.
 	for (uint j = 0; j < m_aoConfigs.size(); ++j)
 	{
-		CSockConfig* pCfg = m_aoConfigs[j];
+		CSockConfigPtr pCfg = m_aoConfigs[j];
 
 		if (pCfg->m_nType == SOCK_STREAM)
 			Dlg.m_anTCPPorts.push_back(pCfg->m_nSrcPort);
@@ -146,7 +145,7 @@ void CSockOptsDlg::OnAdd()
 	if (Dlg.RunModal(*this) == IDOK)
 	{
 		// Add config to collection.
-		CSockConfig* pConfig = new CSockConfig;
+		CSockConfigPtr pConfig(new CSockConfig);
 
 		*pConfig = Dlg.m_oConfig;
 
@@ -156,9 +155,9 @@ void CSockOptsDlg::OnAdd()
 		int i = m_lvSocks.ItemCount();
 
 		m_lvSocks.InsertItem(i, TXT(""));
-		m_lvSocks.ItemPtr(i, pConfig);
+		m_lvSocks.ItemPtr(i, pConfig.Get());
 
-		UpdateConfig(i, pConfig);
+		UpdateConfig(i, pConfig.Get());
 
 		// Make it the selection.
 		m_lvSocks.Select(i);
@@ -195,9 +194,9 @@ void CSockOptsDlg::OnEdit()
 	// Set ports in use.
 	for (uint j = 0; j < m_aoConfigs.size(); ++j)
 	{
-		CSockConfig* pCfg = m_aoConfigs[j];
+		CSockConfigPtr pCfg = m_aoConfigs[j];
 
-		if (pCfg == pConfig)
+		if (pCfg.Get() == pConfig)
 			continue;
 
 		if (pCfg->m_nType == SOCK_STREAM)
@@ -218,6 +217,23 @@ void CSockOptsDlg::OnEdit()
 		m_bModified = true;
 	}
 }
+
+////////////////////////////////////////////////////////////////////////////////
+//! Functor to compare a raw pointer with a smart-pointer
+
+struct ComparePtrs : public std::unary_function<CSockConfigPtr, bool>
+{
+	CSockConfig* m_ptr;
+
+	ComparePtrs(CSockConfig* ptr)
+		: m_ptr(ptr)
+	{ }
+
+	result_type operator()(const argument_type& arg)
+	{
+		return (arg.Get() == m_ptr);
+	}
+};
 
 /******************************************************************************
 ** Method:		OnRemove()
@@ -243,7 +259,7 @@ void CSockOptsDlg::OnRemove()
 
 	// Remove from view and collection.
 	m_lvSocks.DeleteItem(nSel);
-	Delete(m_aoConfigs, FindIndexOf(m_aoConfigs, pConfig));
+	m_aoConfigs.erase(std::find_if(m_aoConfigs.begin(), m_aoConfigs.end(), ComparePtrs(pConfig)));
 
 	// Update selection.
 	m_lvSocks.Select((nSel < m_lvSocks.ItemCount()) ? nSel : nSel-1);
