@@ -37,7 +37,7 @@ BEGIN
 			VALUE "FileDescription",  "Socket Trace\0"
 			VALUE "FileVersion",      "1.6 Beta\0"
 			VALUE "InternalName",     "SockTrace.exe\0"
-			VALUE "LegalCopyright",   "(C) Chris Oldwood 2003-2004\0"
+			VALUE "LegalCopyright",   "(C) Chris Oldwood 2003-2008\0"
 			VALUE "OriginalFilename", "Socket Trace.exe\0"
 			VALUE "ProductName",      "Socket Trace\0"
 			VALUE "ProductVersion",   "1.6 Beta\0"

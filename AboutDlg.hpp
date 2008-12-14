@@ -1,16 +1,11 @@
-/******************************************************************************
-** (C) Chris Oldwood
-**
-** MODULE:		ABOUTDLG.HPP
-** COMPONENT:	The Application.
-** DESCRIPTION:	The CAboutDlg class declaration.
-**
-*******************************************************************************
-*/
+////////////////////////////////////////////////////////////////////////////////
+//! \file   AboutDlg.hpp
+//! \brief  The AboutDlg class declaration.
+//! \author Chris Oldwood
 
 // Check for previous inclusion
-#ifndef ABOUTDLG_HPP
-#define ABOUTDLG_HPP
+#ifndef APP_ABOUTDLG_HPP
+#define APP_ABOUTDLG_HPP
 
 #if _MSC_VER > 1000
 #pragma once
@@ -18,40 +13,33 @@
 
 #include <WCL/CommonUI.hpp>
 
-/******************************************************************************
-** 
-** This is the dialog that display program version and copyright information.
-**
-*******************************************************************************
-*/
+////////////////////////////////////////////////////////////////////////////////
+//! The dialog used to display the version number and copyright message.
 
-class CAboutDlg : public CDialog
+class AboutDlg : public CDialog
 {
 public:
-	//
-	// Constructors/Destructor.
-	//
-	CAboutDlg();
+	//! Constructor.
+	AboutDlg();
+
+	//! Destructor.
+	virtual ~AboutDlg();
 	
 protected:
 	//
-	// Members.
+	// Controls.
 	//
-	CLabel		m_txtVersion;
-	CURLLabel	m_txtEmail;
-	CURLLabel	m_txtWebSite;
+	CLabel		m_versionLabel;		//!< The version label.
+	CLabel		m_crightLabel;		//!< The copyright label.
+	CURLLabel	m_emailLabel;		//!< The email address label.
+	CURLLabel	m_webLabel;			//!< The website label.
 	
 	//
 	// Message processors.
 	//
+
+	//! Handle dialog creation.
 	virtual void OnInitDialog();
 };
 
-/******************************************************************************
-**
-** Implementation of inline functions.
-**
-*******************************************************************************
-*/
-
-#endif //ABOUTDLG_HPP
+#endif // APP_ABOUTDLG_HPP
