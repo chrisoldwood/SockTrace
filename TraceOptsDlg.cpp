@@ -96,7 +96,7 @@ bool CTraceOptsDlg::OnOk()
 	App.m_bCfgModified = true;
 
 	// Update full path to trace file.
-	App.m_strTracePath = CPath(CPath::ApplicationDir(), App.m_strTraceFile);
+	App.m_strTracePath = App.m_appDataFolder / App.m_strTraceFile;
 
 	return true;
 }
