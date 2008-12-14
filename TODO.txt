@@ -1,3 +1,7 @@
 - View logfiles from connection history dialog (ASCII + Hex views).
 
-- Can't have both a TCP and UDP on the same port as the .ini file only uses the port.
+- Time/Date format in log message.
+
+- Add ms to time in log message.
+
+- Folder used to save data.

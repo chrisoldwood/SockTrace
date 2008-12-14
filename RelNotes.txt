@@ -1,3 +1,13 @@
+Version 1.6
+===========
+
+- Fixed the bug where you couldn't configure the same port for both TCP and UDP.
+- Added dialog to allow configuration of the trace output.
+- Made the Connection History dialog resizable and added a 'Status' column.
+- Replaced use of old custom containers with STL ones.
+- Ported to Visual C++ 7.1 and changed default build type to Unicode.
+
+
 Version 1.5
 ===========
 
@@ -30,4 +40,4 @@ Version 1.0
 Chris Oldwood 
 (gort@cix.co.uk)
 
-6th July 2004
+17th November 2008
