@@ -15,9 +15,9 @@
 #include "TraceOptsDlg.hpp"
 #include "SockOptsDlg.hpp"
 #include "AboutDlg.hpp"
-#include <Legacy/STLUtils.hpp>
 #include "TCPSockPair.hpp"
 #include <Core/AnsiWide.hpp>
+#include <Core/Algorithm.hpp>
 
 /******************************************************************************
 ** Method:		Constructor.
@@ -203,7 +203,7 @@ void CAppCmds::OnOptionsSocket()
 	// Check if there are any open connections.
 	for (uint i = 0; i < App.m_aoTCPCltSocks.size(); ++i)
 	{
-		CTCPSockPair* pPair = App.m_aoTCPCltSocks[i];
+		CTCPSockPairPtr pPair = App.m_aoTCPCltSocks[i];
 
 		if (pPair->m_pInpSocket->IsOpen() && pPair->m_pOutSocket->IsOpen())
 			bOpen = true;
@@ -219,7 +219,7 @@ void CAppCmds::OnOptionsSocket()
 
 	CSockOptsDlg Dlg;
 
-	DeepCopy(App.m_aoConfigs, Dlg.m_aoConfigs);
+	Core::deepCopy(App.m_aoConfigs, Dlg.m_aoConfigs);
 
 	// Show sockets config dialog.
 	if ( (Dlg.RunModal(App.m_rMainWnd) == IDOK) && (Dlg.m_bModified) )
@@ -227,8 +227,8 @@ void CAppCmds::OnOptionsSocket()
 		// Close all current sockets.
 		App.CloseSockets();
 
-		DeleteAll(App.m_aoConfigs);
-		DeepCopy(Dlg.m_aoConfigs, App.m_aoConfigs);
+		App.m_aoConfigs.clear();
+		Core::deepCopy(Dlg.m_aoConfigs, App.m_aoConfigs);
 
 		App.m_bCfgModified = true;
 
@@ -251,7 +251,7 @@ void CAppCmds::OnOptionsSocket()
 
 void CAppCmds::OnHelpAbout()
 {
-	CAboutDlg Dlg;
+	AboutDlg Dlg;
 
 	Dlg.RunModal(App.m_rMainWnd);
 }
