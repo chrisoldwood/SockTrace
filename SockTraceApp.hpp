@@ -19,7 +19,6 @@
 #include <WCL/App.hpp>
 #include "AppWnd.hpp"
 #include "AppCmds.hpp"
-#include <WCL/IniFile.hpp>
 #include <NCL/IClientSocketListener.hpp>
 #include <NCL/IServerSocketListener.hpp>
 #include "SockConfig.hpp"
@@ -27,16 +26,25 @@
 // Forward declarations.
 class CSockConfig;
 class CTCPSvrSocket;
+class CTCPCltSocket;
 class CTCPSockPair;
 class CUDPSockPair;
 class CSocket;
 class CSockPair;
 
+// Smart-pointer types.
+typedef Core::SharedPtr<CSocket> CSocketPtr;
+typedef Core::SharedPtr<CTCPSvrSocket> CTCPSvrSocketPtr;
+typedef Core::SharedPtr<CTCPCltSocket> CTCPCltSocketPtr;
+typedef Core::SharedPtr<CSockPair> CSockPairPtr;
+typedef Core::SharedPtr<CTCPSockPair> CTCPSockPairPtr;
+typedef Core::SharedPtr<CUDPSockPair> CUDPSockPairPtr;
+
 // Template shorthands.
-typedef std::vector<CTCPSvrSocket*> CTCPSvrSockets;
-typedef std::vector<CTCPSockPair*>  CTCPCltSockets;
-typedef std::vector<CUDPSockPair*>  CUDPSvrSockets;
-typedef std::map<CSocket*, CSockPair*> CSocketMap;
+typedef std::vector<CTCPSvrSocketPtr> CTCPSvrSockets;
+typedef std::vector<CTCPSockPairPtr>  CTCPCltSockets;
+typedef std::vector<CUDPSockPairPtr>  CUDPSvrSockets;
+typedef std::map<CSocket*, CSockPairPtr> CSocketMap;
 
 /******************************************************************************
 ** 
@@ -62,7 +70,6 @@ public:
 
 	uint			m_nInstance;		// The instance counter.
 
-	CIniFile		m_oIniFile;			// .INI FIle
 	CRect			m_rcLastPos;		// Main window position.
 
 	CSockConfigs	m_aoConfigs;		// The socket configurations.
@@ -83,6 +90,7 @@ public:
 	bool			m_bTraceToFile;		// Trace output to file?
 	CString			m_strTraceFile;		// Trace filename.
 
+	CPath			m_appDataFolder;	//!< The application data folder.
 	CPath			m_strTracePath;		// The trace file full path.
 
 	//
@@ -94,11 +102,6 @@ public:
 	void Trace(const tchar* pszMsg, ...);
 	void LogData(CPath& strFileName, const void* pvData, uint nLength);
 
-	//
-	// Constants.
-	//
-	static const tchar* VERSION;
-
 protected:
 	//
 	// Startup and Shutdown template methods.
@@ -109,25 +112,23 @@ protected:
 	//
 	// Config methods.
 	//
-	void LoadConfig();
-	void SaveConfig();
+	void loadConfig();
+	void saveConfig();
 
 	//
 	// Socket methods.
 	//
-	CSockConfig* FindConfig(int nType, uint nPort) const;
+	CSockConfigPtr FindConfig(int nType, uint nPort) const;
 
 	//
 	// Constants.
 	//
-	static const tchar* INI_FILE_VER;
-
 	static const bool  DEF_TRAY_ICON;
 	static const bool  DEF_MIN_TO_TRAY;
 	static const bool  DEF_TRACE_CONNS;
 	static const bool  DEF_TRACE_DATA;
 	static const bool  DEF_TRACE_TO_WINDOW;
-	static const int   DEF_TRACE_LINES;
+	static const uint  DEF_TRACE_LINES;
 	static const bool  DEF_TRACE_TO_FILE;
 	static const tchar* DEF_TRACE_FILE;
 

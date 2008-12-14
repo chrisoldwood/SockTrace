@@ -22,6 +22,8 @@
 class CSockConfig;
 class CParams;
 
+typedef Core::SharedPtr<CSockConfig> CSockConfigPtr;
+
 /******************************************************************************
 ** 
 ** The base class for a pair of sockets.
@@ -35,14 +37,14 @@ public:
 	//
 	// Constructors/Destructor.
 	//
-	CSockPair(CSockConfig* pConfig, uint nInstance);
+	CSockPair(CSockConfigPtr pConfig, uint nInstance);
 	virtual ~CSockPair();
 	
 	//
 	// Members.
 	//
 	uint			m_nInstance;	// The pair instance ID.
-	CSockConfig*	m_pConfig;		// The socket config.
+	CSockConfigPtr	m_pConfig;		// The socket config.
 	CPath			m_strSendFile;	// Path of log file for data sent.
 	CPath			m_strRecvFile;	// Path of log file for data recieved.
 	uint			m_nBytesSent;	// Total bytes sent.

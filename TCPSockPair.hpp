@@ -35,14 +35,14 @@ public:
 	//
 	// Constructors/Destructor.
 	//
-	CTCPSockPair(CSockConfig* pConfig, uint nInstance, CTCPCltSocket* pInpSocket, CTCPCltSocket* pOutSocket);
+	CTCPSockPair(CSockConfigPtr pConfig, uint nInstance, CTCPCltSocketPtr pInpSocket, CTCPCltSocketPtr pOutSocket);
 	virtual ~CTCPSockPair();
 	
 	//
 	// Members.
 	//
-	CTCPCltSocket*	m_pInpSocket;	// The client connection.
-	CTCPCltSocket*	m_pOutSocket;	// The server connection.
+	CTCPCltSocketPtr	m_pInpSocket;	// The client connection.
+	CTCPCltSocketPtr	m_pOutSocket;	// The server connection.
 };
 
 /******************************************************************************
@@ -52,7 +52,7 @@ public:
 *******************************************************************************
 */
 
-inline CTCPSockPair::CTCPSockPair(CSockConfig* pConfig, uint nInstance, CTCPCltSocket* pInpSocket, CTCPCltSocket* pOutSocket)
+inline CTCPSockPair::CTCPSockPair(CSockConfigPtr pConfig, uint nInstance, CTCPCltSocketPtr pInpSocket, CTCPCltSocketPtr pOutSocket)
 	: CSockPair(pConfig, nInstance)
 	, m_pInpSocket(pInpSocket)
 	, m_pOutSocket(pOutSocket)
@@ -61,8 +61,6 @@ inline CTCPSockPair::CTCPSockPair(CSockConfig* pConfig, uint nInstance, CTCPCltS
 
 inline CTCPSockPair::~CTCPSockPair()
 {
-	delete m_pInpSocket;
-	delete m_pOutSocket;
 }
 
 #endif // TCPSOCKPAIR_HPP

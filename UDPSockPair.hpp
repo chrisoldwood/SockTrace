@@ -32,7 +32,7 @@ public:
 	//
 	// Constructors/Destructor.
 	//
-	CUDPSockPair(CSockConfig* pConfig, uint nInstance);
+	CUDPSockPair(CSockConfigPtr pConfig, uint nInstance);
 	virtual ~CUDPSockPair();
 	
 	//
@@ -53,7 +53,7 @@ public:
 *******************************************************************************
 */
 
-inline CUDPSockPair::CUDPSockPair(CSockConfig* pConfig, uint nInstance)
+inline CUDPSockPair::CUDPSockPair(CSockConfigPtr pConfig, uint nInstance)
 	: CSockPair(pConfig, nInstance)
 {
 	// Reset source address and port.

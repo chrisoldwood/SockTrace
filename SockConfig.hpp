@@ -40,6 +40,7 @@ public:
 };
 
 // Template shorthands.
-typedef std::vector<CSockConfig*> CSockConfigs;
+typedef Core::SharedPtr<CSockConfig> CSockConfigPtr;
+typedef std::vector<CSockConfigPtr> CSockConfigs;
 
 #endif // SOCKCONFIG_HPP
