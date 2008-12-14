@@ -72,7 +72,7 @@ void CConnsDlg::OnInitDialog()
 	// Add all TCP sockets...
 	for (uint i = 0; i < App.m_aoTCPCltSocks.size(); ++i)
 	{
-		CTCPSockPair* pPair = App.m_aoTCPCltSocks[i];
+		CTCPSockPairPtr pPair = App.m_aoTCPCltSocks[i];
 
 		CString strConn = CStrCvt::FormatInt(pPair->m_nInstance);
 
