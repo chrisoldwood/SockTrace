@@ -13,6 +13,7 @@
 #include "Params.hpp"
 #include "SockConfig.hpp"
 #include <WCL/StrCvt.hpp>
+#include "SockTraceApp.hpp"
 
 /******************************************************************************
 ** Method:		Constructor.
@@ -26,14 +27,12 @@
 *******************************************************************************
 */
 
-CSockPair::CSockPair(CSockConfig* pConfig, uint nInstance)
+CSockPair::CSockPair(CSockConfigPtr pConfig, uint nInstance)
 	: m_pConfig(pConfig)
 	, m_nInstance(nInstance)
 	, m_nBytesSent(0)
 	, m_nBytesRecv(0)
 {
-	ASSERT(pConfig != NULL);
-
 	CParams oParams;
 
 	// Set the common parameters.
@@ -104,5 +103,5 @@ CPath CSockPair::ParseFileName(const tchar* pszFileName, const CParams& oParams)
 		strFileName.Insert(nStartChar, strValue);
 	}
 
-	return CPath::ApplicationDir() / strFileName;
+	return App.m_appDataFolder / strFileName;
 }
