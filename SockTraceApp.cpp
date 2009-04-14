@@ -393,7 +393,7 @@ void CSockTraceApp::Trace(const tchar* pszMsg, ...)
 				fLogFile.Create(m_strTracePath);
 
 			// Write trace message to end of file.
-			fLogFile.Seek(0, FILE_END);
+			fLogFile.Seek(0, WCL::IStreamBase::END);
 			fLogFile.WriteLine(strMsg, ANSI_TEXT);
 
 			fLogFile.Close();
@@ -428,7 +428,7 @@ void CSockTraceApp::LogData(CPath& strFileName, const void* pvData, uint nLength
 		else
 			fLogFile.Create(strFileName);
 
-		fLogFile.Seek(0, FILE_END);
+		fLogFile.Seek(0, WCL::IStreamBase::END);
 		fLogFile.Write(pvData, nLength);
 		fLogFile.Close();
 	}
