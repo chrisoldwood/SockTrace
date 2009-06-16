@@ -16,6 +16,8 @@
 #pragma once
 #endif
 
+#include <map>
+
 /******************************************************************************
 ** 
 ** The collection of parameters used when parsing a log filename.
