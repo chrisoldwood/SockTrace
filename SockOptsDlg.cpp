@@ -87,9 +87,9 @@ void CSockOptsDlg::OnInitDialog()
 		CSockConfigPtr pConfig = m_aoConfigs[i];
 
 		m_lvSocks.InsertItem(i, TXT(""));
-		m_lvSocks.ItemPtr(i, pConfig.Get());
+		m_lvSocks.ItemPtr(i, pConfig.get());
 
-		UpdateConfig(i, pConfig.Get());
+		UpdateConfig(i, pConfig.get());
 	}
 
 	// Select 1st by default.
@@ -155,9 +155,9 @@ void CSockOptsDlg::OnAdd()
 		int i = m_lvSocks.ItemCount();
 
 		m_lvSocks.InsertItem(i, TXT(""));
-		m_lvSocks.ItemPtr(i, pConfig.Get());
+		m_lvSocks.ItemPtr(i, pConfig.get());
 
-		UpdateConfig(i, pConfig.Get());
+		UpdateConfig(i, pConfig.get());
 
 		// Make it the selection.
 		m_lvSocks.Select(i);
@@ -196,7 +196,7 @@ void CSockOptsDlg::OnEdit()
 	{
 		CSockConfigPtr pCfg = m_aoConfigs[j];
 
-		if (pCfg.Get() == pConfig)
+		if (pCfg.get() == pConfig)
 			continue;
 
 		if (pCfg->m_nType == SOCK_STREAM)
@@ -231,7 +231,7 @@ struct ComparePtrs : public std::unary_function<CSockConfigPtr, bool>
 
 	result_type operator()(const argument_type& arg)
 	{
-		return (arg.Get() == m_ptr);
+		return (arg.get() == m_ptr);
 	}
 };
 

@@ -147,7 +147,7 @@ bool CSockTraceApp::OnOpen()
 	}
 	catch (const Core::Exception& e)
 	{
-		FatalMsg(TXT("Failed to configure the application:-\n\n%s"), e.What());
+		FatalMsg(TXT("Failed to configure the application:-\n\n%s"), e.twhat());
 		return false;
 	}
 
@@ -167,7 +167,7 @@ bool CSockTraceApp::OnOpen()
 	}
 	catch (CFileException& e)
 	{
-		AlertMsg(TXT("Failed to truncate the log file:\n\n%s"), e.What());
+		AlertMsg(TXT("Failed to truncate the log file:\n\n%s"), e.twhat());
 		return false;
 	}
 
@@ -226,7 +226,7 @@ bool CSockTraceApp::OnClose()
 	}
 	catch (const Core::Exception& e)
 	{
-		FatalMsg(TXT("Failed to save the application configuration:-\n\n%s"), e.What());
+		FatalMsg(TXT("Failed to save the application configuration:-\n\n%s"), e.twhat());
 		return false;
 	}
 
@@ -299,7 +299,7 @@ void CSockTraceApp::OpenSockets()
 			}
 			catch (CSocketException& e)
 			{
-				Trace(TXT("Failed to create local socket on port %d - %s"), pConfig->m_nSrcPort, e.What());
+				Trace(TXT("Failed to create local socket on port %d - %s"), pConfig->m_nSrcPort, e.twhat());
 			}
 		}
 		// UDP socket?
@@ -434,7 +434,7 @@ void CSockTraceApp::LogData(CPath& strFileName, const void* pvData, uint nLength
 	}
 	catch (CFileException& e)
 	{
-		AlertMsg(TXT("Failed to write to log file:\n\n%s"), e.What());
+		AlertMsg(TXT("Failed to write to log file:\n\n%s"), e.twhat());
 	}
 }
 
@@ -459,14 +459,14 @@ void CSockTraceApp::loadConfig()
 	tstring version = appConfig.readString(appConfig.DEFAULT_SECTION, TXT("Version"), CONFIG_VERSION);
 
 	if (version != CONFIG_VERSION)
-		throw Core::ConfigurationException(Core::Fmt(TXT("The configuration data is incompatible - '%s'"), version.c_str()));
+		throw Core::ConfigurationException(Core::fmt(TXT("The configuration data is incompatible - '%s'"), version.c_str()));
 
 	// Read the socket configurations.
 	const size_t max = std::numeric_limits<size_t>::max();
 
 	for (size_t i = 0; i != max; ++i)
 	{
-		tstring entry   = Core::Fmt(TXT("%u"), i);
+		tstring entry   = Core::fmt(TXT("%u"), i);
 		tstring section = appConfig.readString(TXT("Sockets"), entry, TXT(""));
 
 		if (section.empty())
@@ -541,8 +541,8 @@ void CSockTraceApp::saveConfig()
 
 			const tchar* prefix = (pConfig->m_nType == SOCK_STREAM) ? TXT("TCP") : TXT("UDP");
 		
-			tstring entry   = Core::Fmt(TXT("%u"), i);
-			tstring section = Core::Fmt(TXT("%s:%u"), prefix, pConfig->m_nSrcPort);
+			tstring entry   = Core::fmt(TXT("%u"), i);
+			tstring section = Core::fmt(TXT("%s:%u"), prefix, pConfig->m_nSrcPort);
 
 			// Write the socket config section.
 			appConfig.writeString(TXT("Sockets"), entry, section);
@@ -624,7 +624,7 @@ void CSockTraceApp::OnAcceptReady(CTCPSvrSocket* pSvrSocket)
 			// Accept the connection.
 			CTCPCltSocketPtr pInpSocket(pSvrSocket->Accept());
 
-			ASSERT(pInpSocket.Get() != nullptr);
+			ASSERT(pInpSocket.get() != nullptr);
 
 			if (App.m_bTraceConns)
 				Trace(TXT("Connection accepted from %s"), pInpSocket->Host());
@@ -632,7 +632,7 @@ void CSockTraceApp::OnAcceptReady(CTCPSvrSocket* pSvrSocket)
 			// Find the config for the server socket.
 			CSockConfigPtr pConfig = FindConfig(pSvrSocket->Type(), pSvrSocket->Port());
 
-			ASSERT(pConfig.Get() != nullptr);
+			ASSERT(pConfig.get() != nullptr);
 
 			// Create socket to destination.
 			CTCPCltSocketPtr pOutSocket(new CTCPCltSocket(CSocket::ASYNC));
@@ -652,13 +652,13 @@ void CSockTraceApp::OnAcceptReady(CTCPSvrSocket* pSvrSocket)
 			m_aoTCPCltSocks.push_back(pSockPair);
 
 			// Add socket pair to map.
-			m_oSockMap.insert(std::make_pair(pInpSocket.Get(), pSockPair));
-			m_oSockMap.insert(std::make_pair(pOutSocket.Get(), pSockPair));
+			m_oSockMap.insert(std::make_pair(pInpSocket.get(), pSockPair));
+			m_oSockMap.insert(std::make_pair(pOutSocket.get(), pSockPair));
 		}
 	}
 	catch (CSocketException& e)
 	{
-		Trace(TXT("Failed to accept client connection on port %d  - %s"), pSvrSocket->Port(), e.What());
+		Trace(TXT("Failed to accept client connection on port %d  - %s"), pSvrSocket->Port(), e.twhat());
 	}
 }
 
@@ -693,7 +693,7 @@ void CSockTraceApp::OnReadReady(CSocket* pSocket)
 			int nAvail, nRead;
 
 			// Check client side socket.
-			if ( (pSocket == pSockPair->m_pInpSocket.Get())
+			if ( (pSocket == pSockPair->m_pInpSocket.get())
 			  && ((nAvail = pSockPair->m_pInpSocket->Available()) > 0) )
 			{
 				CBuffer oBuffer(nAvail);
@@ -716,7 +716,7 @@ void CSockTraceApp::OnReadReady(CSocket* pSocket)
 			}
 
 			// Check server side socket.
-			if ( (pSocket == pSockPair->m_pOutSocket.Get())
+			if ( (pSocket == pSockPair->m_pOutSocket.get())
 			  && ((nAvail = pSockPair->m_pOutSocket->Available()) > 0) )
 			{
 				CBuffer oBuffer(nAvail);
@@ -796,7 +796,7 @@ void CSockTraceApp::OnReadReady(CSocket* pSocket)
 	}
 	catch (CSocketException& e)
 	{
-		Trace(TXT("Failed to forward packets on connection %d - %s"), pPair->m_nInstance, e.What());
+		Trace(TXT("Failed to forward packets on connection %d - %s"), pPair->m_nInstance, e.twhat());
 	}
 }
 
@@ -822,7 +822,7 @@ void CSockTraceApp::OnClosed(CSocket* pSocket, int /*nReason*/)
 
 	CSockPairPtr pSockPair = it->second;
 
-	ASSERT(pSockPair.Get() != nullptr);
+	ASSERT(pSockPair.get() != nullptr);
 	ASSERT(pSockPair->m_pConfig->m_nType == SOCK_STREAM);
 
 	// Must be a TCP pair.
@@ -840,8 +840,8 @@ void CSockTraceApp::OnClosed(CSocket* pSocket, int /*nReason*/)
 	pTCPSockPair->m_pOutSocket->Close();
 
 	// Remove socket pair from map.
-	m_oSockMap.erase(m_oSockMap.find(pTCPSockPair->m_pInpSocket.Get()));
-	m_oSockMap.erase(m_oSockMap.find(pTCPSockPair->m_pOutSocket.Get()));
+	m_oSockMap.erase(m_oSockMap.find(pTCPSockPair->m_pInpSocket.get()));
+	m_oSockMap.erase(m_oSockMap.find(pTCPSockPair->m_pOutSocket.get()));
 }
 
 /******************************************************************************
@@ -867,7 +867,7 @@ void CSockTraceApp::OnError(CSocket* pSocket, int nEvent, int nError)
 
 	CSockPairPtr pSockPair = it->second;
 
-	ASSERT(pSockPair.Get() != nullptr);
+	ASSERT(pSockPair.get() != nullptr);
 
 	Trace(TXT("%s Error on connection %d: %s"), CSocket::AsyncEventStr(nEvent), pSockPair->m_nInstance, CWinSock::ErrorToSymbol(nError));
 }
