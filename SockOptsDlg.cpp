@@ -152,7 +152,7 @@ void CSockOptsDlg::OnAdd()
 		m_aoConfigs.push_back(pConfig);
 
 		// Add config to view.
-		int i = m_lvSocks.ItemCount();
+		size_t i = m_lvSocks.ItemCount();
 
 		m_lvSocks.InsertItem(i, TXT(""));
 		m_lvSocks.ItemPtr(i, pConfig.get());
@@ -180,7 +180,7 @@ void CSockOptsDlg::OnAdd()
 
 void CSockOptsDlg::OnEdit()
 {
-	int nSel = m_lvSocks.Selection();
+	size_t nSel = m_lvSocks.Selection();
 
 	// Ignore, if no selection.
 	if (nSel == LB_ERR)

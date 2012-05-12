@@ -100,7 +100,7 @@ public:
 	void CloseSockets();
 
 	void Trace(const tchar* pszMsg, ...);
-	void LogData(CPath& strFileName, const void* pvData, uint nLength);
+	void LogData(CPath& strFileName, const void* pvData, size_t nLength);
 
 protected:
 	//

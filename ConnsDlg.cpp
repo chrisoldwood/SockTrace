@@ -11,9 +11,9 @@
 #include "Common.hpp"
 #include "ConnsDlg.hpp"
 #include "SockTraceApp.hpp"
-#include <WCL/StrCvt.hpp>
 #include "TCPSockPair.hpp"
 #include "SockConfig.hpp"
+#include <Core/StringUtils.hpp>
 
 /******************************************************************************
 ** Method:		Default constructor.
@@ -74,17 +74,15 @@ void CConnsDlg::OnInitDialog()
 	{
 		CTCPSockPairPtr pPair = App.m_aoTCPCltSocks[i];
 
-		CString strConn = CStrCvt::FormatInt(pPair->m_nInstance);
-
 		bool bOpen = (pPair->m_pInpSocket->IsOpen() && pPair->m_pOutSocket->IsOpen());
 
-		m_lvSocks.InsertItem(i,           strConn);
+		m_lvSocks.InsertItem(i,           Core::format(pPair->m_nInstance));
 		m_lvSocks.ItemText  (i, STATUS,   (bOpen) ? TXT("Open") : TXT("Closed"));
 		m_lvSocks.ItemText  (i, PROTOCOL, pPair->m_pConfig->m_strType);
 		m_lvSocks.ItemText  (i, HOST,     pPair->m_pConfig->m_strDstHost);
-		m_lvSocks.ItemText  (i, PORT,     CStrCvt::FormatInt(pPair->m_pConfig->m_nDstPort));
-		m_lvSocks.ItemText  (i, SENT,     CStrCvt::FormatInt(pPair->m_nBytesSent));
-		m_lvSocks.ItemText  (i, RECV,     CStrCvt::FormatInt(pPair->m_nBytesRecv));
+		m_lvSocks.ItemText  (i, PORT,     Core::format(pPair->m_pConfig->m_nDstPort));
+		m_lvSocks.ItemText  (i, SENT,     Core::format(pPair->m_nBytesSent));
+		m_lvSocks.ItemText  (i, RECV,     Core::format(pPair->m_nBytesRecv));
 	}
 }
 

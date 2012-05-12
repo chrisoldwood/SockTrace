@@ -83,16 +83,16 @@ CPath CSockPair::ParseFileName(const tchar* pszFileName, const CParams& oParams)
 {
 	ASSERT(pszFileName != NULL);
 
-	CPath strFileName = pszFileName;
-	int   nStartChar  = -1;
+	CPath  strFileName = pszFileName;
+	size_t nStartChar  = Core::npos;
 
 	// For all parameters...
-	while ((nStartChar = strFileName.Find('%')) != -1)
+	while ((nStartChar = strFileName.Find('%')) != Core::npos)
 	{
-		int nEndChar = -1;
+		size_t nEndChar = Core::npos;
 
 		// Find the parameter end marker.
-		if ((nEndChar = strFileName.Find('%', nStartChar+1)) == -1)
+		if ((nEndChar = strFileName.Find('%', nStartChar+1)) == Core::npos)
 			break;
 
 		// Find the parameter value.

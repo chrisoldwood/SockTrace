@@ -417,7 +417,7 @@ void CSockTraceApp::Trace(const tchar* pszMsg, ...)
 *******************************************************************************
 */
 
-void CSockTraceApp::LogData(CPath& strFileName, const void* pvData, uint nLength)
+void CSockTraceApp::LogData(CPath& strFileName, const void* pvData, size_t nLength)
 {
 	try
 	{
@@ -690,7 +690,7 @@ void CSockTraceApp::OnReadReady(CSocket* pSocket)
 		{
 			CTCPSockPairPtr pSockPair = Core::static_ptr_cast<CTCPSockPair>(pPair);
 
-			int nAvail, nRead;
+			size_t nAvail, nRead;
 
 			// Check client side socket.
 			if ( (pSocket == pSockPair->m_pInpSocket.get())
@@ -743,7 +743,7 @@ void CSockTraceApp::OnReadReady(CSocket* pSocket)
 		{
 			CUDPSockPairPtr pSockPair = Core::static_ptr_cast<CUDPSockPair>(pPair);
 
-			int nAvail, nRead;
+			size_t nAvail, nRead;
 
 			// Check client side socket.
 			if ( (pSocket == &pSockPair->m_oInpSocket)
