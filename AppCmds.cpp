@@ -31,7 +31,8 @@
 *******************************************************************************
 */
 
-CAppCmds::CAppCmds()
+CAppCmds::CAppCmds(CAppWnd& appWnd)
+	: CCmdControl(appWnd)
 {
 	// Define the command table.
 	DEFINE_CMD_TABLE

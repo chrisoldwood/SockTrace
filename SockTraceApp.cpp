@@ -75,6 +75,8 @@ const tchar* CSockTraceApp::DEF_TRACE_FILE     = TXT("SockTrace.log");
 
 CSockTraceApp::CSockTraceApp()
 	: CApp(m_AppWnd, m_AppCmds)
+	, m_AppWnd()
+	, m_AppCmds(m_AppWnd)
 	, m_nInstance(1)
 	, m_bCfgModified(false)
 	, m_bTrayIcon(DEF_TRAY_ICON)
@@ -176,7 +178,7 @@ bool CSockTraceApp::OnOpen()
 		return false;
 
 	// Show it.
-	if (ShowNormal() && !m_rcLastPos.Empty())
+	if (!m_rcLastPos.Empty())
 		m_AppWnd.Move(m_rcLastPos);
 
 	m_AppWnd.Show(m_iCmdShow);
