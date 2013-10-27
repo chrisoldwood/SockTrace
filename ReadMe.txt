@@ -1,36 +1,27 @@
 Socket Trace v1.6
 =================
 
+Introduction
+------------
 
-1: Installation
----------------
+This tool acts as a proxy for TCP & UDP sockets so that the traffic can be
+logged to one or more files, one for each connection.
 
-Run setup.exe.
-
-or
-
-Copy the files SockTrace.* to a folder.
-
-
-2: Uninstallation
------------------
-
-Delete the files listed above.
-
-
-3: Help/Manual
---------------
+Documentation
+-------------
 
 There is no manual at present.
 
+Development
+-----------
 
-4: Contact Details
-------------------
+See DevNotes.txt
+
+Contact Details
+---------------
 
 Email: gort@cix.co.uk
-Web:   http://www.cix.co.uk/~gort
+Web:   http://www.chrisoldwood.com
 
-
-Chris Oldwood 
-
+Chris Oldwood
 17th November 2008
