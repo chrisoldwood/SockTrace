@@ -4,10 +4,7 @@
 	Version="7.10"
 	Name="SockTrace"
 	ProjectGUID="{F2D13864-87C2-4B32-9CA9-F2A10A15EC0F}"
-	SccProjectName="SAK"
-	SccAuxPath="SAK"
-	SccLocalPath="SAK"
-	SccProvider="SAK">
+	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
 			Name="Win32"/>
