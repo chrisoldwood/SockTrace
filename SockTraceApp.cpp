@@ -26,7 +26,7 @@
 #include <WCL/AppConfig.hpp>
 #include <Core/ConfigurationException.hpp>
 #include <limits>
-#include <shfolder.h>
+#include <shlobj.h>
 
 /******************************************************************************
 **
