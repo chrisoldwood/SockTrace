@@ -167,7 +167,7 @@ bool CSockTraceApp::OnOpen()
 			fFile.Close();
 		}
 	}
-	catch (CFileException& e)
+	catch (const CFileException& e)
 	{
 		AlertMsg(TXT("Failed to truncate the log file:\n\n%s"), e.twhat());
 		return false;
@@ -269,7 +269,7 @@ void CSockTraceApp::OpenSockets()
 				Trace(TXT("Resolved hostname %s to %s"), pConfig->m_strDstHost, pConfig->m_strDstAddr);
 			}
 		}
-		catch (CSocketException& e)
+		catch (const CSocketException& e)
 		{
 			Trace(TXT("Failed to resolve hostname %s - %s"), pConfig->m_strDstHost, CWinSock::ErrorToSymbol(e.m_nWSACode));
 		}
@@ -299,7 +299,7 @@ void CSockTraceApp::OpenSockets()
 				// Add to the collection.
 				m_aoTCPSvrSocks.push_back(pTCPSvrSock);
 			}
-			catch (CSocketException& e)
+			catch (const CSocketException& e)
 			{
 				Trace(TXT("Failed to create local socket on port %d - %s"), pConfig->m_nSrcPort, e.twhat());
 			}
@@ -401,7 +401,7 @@ void CSockTraceApp::Trace(const tchar* pszMsg, ...)
 			fLogFile.Close();
 		}
 	}
-	catch (CFileException& /*e*/)
+	catch (const CFileException& /*e*/)
 	{ }
 }
 
@@ -434,7 +434,7 @@ void CSockTraceApp::LogData(CPath& strFileName, const void* pvData, size_t nLeng
 		fLogFile.Write(pvData, nLength);
 		fLogFile.Close();
 	}
-	catch (CFileException& e)
+	catch (const CFileException& e)
 	{
 		AlertMsg(TXT("Failed to write to log file:\n\n%s"), e.twhat());
 	}
@@ -658,7 +658,7 @@ void CSockTraceApp::OnAcceptReady(CTCPSvrSocket* pSvrSocket)
 			m_oSockMap.insert(std::make_pair(pOutSocket.get(), pSockPair));
 		}
 	}
-	catch (CSocketException& e)
+	catch (const CSocketException& e)
 	{
 		Trace(TXT("Failed to accept client connection on port %d  - %s"), pSvrSocket->Port(), e.twhat());
 	}
@@ -796,7 +796,7 @@ void CSockTraceApp::OnReadReady(CSocket* pSocket)
 			}
 		}
 	}
-	catch (CSocketException& e)
+	catch (const CSocketException& e)
 	{
 		Trace(TXT("Failed to forward packets on connection %d - %s"), pPair->m_nInstance, e.twhat());
 	}

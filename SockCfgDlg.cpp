@@ -163,7 +163,7 @@ void CSockCfgDlg::OnResolveHost()
 		// Attempt to resolve it.
 		m_ebDstHost.Text(CSocket::ResolveStr(strHost));
 	}
-	catch (CSocketException& /*e*/)
+	catch (const CSocketException& /*e*/)
 	{
 		AlertMsg(TXT("Failed to resolve: %s"), strHost);
 	}
