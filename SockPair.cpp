@@ -81,7 +81,7 @@ CSockPair::~CSockPair()
 
 CPath CSockPair::ParseFileName(const tchar* pszFileName, const CParams& oParams)
 {
-	ASSERT(pszFileName != NULL);
+	ASSERT(pszFileName != nullptr);
 
 	CPath  strFileName = pszFileName;
 	size_t nStartChar  = Core::npos;

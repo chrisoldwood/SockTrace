@@ -184,7 +184,7 @@ void CSockCfgDlg::OnResolveHost()
 
 bool CSockCfgDlg::Validate(CEditBox& oEditBox, const tchar* pszSetting)
 {
-	ASSERT(pszSetting != NULL);
+	ASSERT(pszSetting != nullptr);
 
 	// Edit box empty?
 	if (oEditBox.TextLength() == 0)

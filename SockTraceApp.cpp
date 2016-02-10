@@ -585,7 +585,7 @@ void CSockTraceApp::saveConfig()
 ** Parameters:	nType	The socket type.
 **				nPort	The port number.
 **
-** Returns:		The config or NULL.
+** Returns:		The config or nullptr.
 **
 *******************************************************************************
 */
