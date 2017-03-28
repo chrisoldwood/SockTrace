@@ -4,6 +4,7 @@
 	Version="9.00"
 	Name="SockTrace"
 	ProjectGUID="{F2D13864-87C2-4B32-9CA9-F2A10A15EC0F}"
+	RootNamespace="SockTrace"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -130,7 +131,6 @@
 				MinimalRebuild="true"
 				ExceptionHandling="0"
 				BasicRuntimeChecks="3"
-				SmallerTypeCheck="true"
 				RuntimeLibrary="1"
 				TreatWChar_tAsBuiltInType="true"
 				ForceConformanceInForLoopScope="true"
@@ -186,12 +186,15 @@
 	<References>
 		<ProjectReference
 			ReferencedProjectIdentifier="{790BC113-52FB-4565-8968-79B8B011C520}"
+			RelativePathToProject="..\Lib\Core\Core.vcproj"
 		/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{FAB8D717-85EC-4896-B5DC-FDF0A0B67C92}"
+			RelativePathToProject="..\Lib\NCL\NCL.vcproj"
 		/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{9B0335B6-93BE-4604-8497-27431874D758}"
+			RelativePathToProject="..\Lib\WCL\Wcl.vcproj"
 		/>
 	</References>
 	<Files>
