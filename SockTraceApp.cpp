@@ -266,12 +266,12 @@ void CSockTraceApp::OpenSockets()
 			{
 				pConfig->m_strDstAddr = CSocket::ResolveStr(pConfig->m_strDstHost);
 
-				Trace(TXT("Resolved hostname %s to %s"), pConfig->m_strDstHost, pConfig->m_strDstAddr);
+				Trace(TXT("Resolved hostname %s to %s"), pConfig->m_strDstHost.c_str(), pConfig->m_strDstAddr.c_str());
 			}
 		}
 		catch (const CSocketException& e)
 		{
-			Trace(TXT("Failed to resolve hostname %s - %s"), pConfig->m_strDstHost, CWinSock::ErrorToSymbol(e.m_nWSACode));
+			Trace(TXT("Failed to resolve hostname %s - %s"), pConfig->m_strDstHost.c_str(), CWinSock::ErrorToSymbol(e.m_nWSACode).c_str());
 		}
 	}
 
@@ -629,7 +629,7 @@ void CSockTraceApp::OnAcceptReady(CTCPSvrSocket* pSvrSocket)
 			ASSERT(pInpSocket.get() != nullptr);
 
 			if (App.m_bTraceConns)
-				Trace(TXT("Connection accepted from %s"), pInpSocket->Host());
+				Trace(TXT("Connection accepted from %s"), pInpSocket->Host().c_str());
 
 			// Find the config for the server socket.
 			CSockConfigPtr pConfig = FindConfig(pSvrSocket->Type(), pSvrSocket->Port());
@@ -642,7 +642,7 @@ void CSockTraceApp::OnAcceptReady(CTCPSvrSocket* pSvrSocket)
 			pOutSocket->Connect(pConfig->m_strDstHost, pConfig->m_nDstPort);
 
 			if (App.m_bTraceConns)
-				Trace(TXT("Opened TCP connection %d to server %s:%d"), m_nInstance, pOutSocket->Host(), pOutSocket->Port());
+				Trace(TXT("Opened TCP connection %d to server %s:%d"), m_nInstance, pOutSocket->Host().c_str(), pOutSocket->Port());
 
 			// Attach event handler.
 			pInpSocket->AddClientListener(this);
@@ -871,5 +871,5 @@ void CSockTraceApp::OnError(CSocket* pSocket, int nEvent, int nError)
 
 	ASSERT(pSockPair.get() != nullptr);
 
-	Trace(TXT("%s Error on connection %d: %s"), CSocket::AsyncEventStr(nEvent), pSockPair->m_nInstance, CWinSock::ErrorToSymbol(nError));
+	Trace(TXT("%s Error on connection %d: %s"), CSocket::AsyncEventStr(nEvent).c_str(), pSockPair->m_nInstance, CWinSock::ErrorToSymbol(nError).c_str());
 }

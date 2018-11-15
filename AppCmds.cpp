@@ -147,7 +147,7 @@ void CAppCmds::OnToolsEditHosts()
 
 	// Report any error.
 	if (nResult <= 31)
-		App.AlertMsg(TXT("Failed to execute:\n\n%s\n\nError code: %d"), strCmdLine, nResult);
+		App.AlertMsg(TXT("Failed to execute:\n\n%s\n\nError code: %d"), strCmdLine.c_str(), nResult);
 }
 
 /******************************************************************************

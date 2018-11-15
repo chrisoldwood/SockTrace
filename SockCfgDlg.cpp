@@ -165,7 +165,7 @@ void CSockCfgDlg::OnResolveHost()
 	}
 	catch (const CSocketException& /*e*/)
 	{
-		AlertMsg(TXT("Failed to resolve: %s"), strHost);
+		AlertMsg(TXT("Failed to resolve: %s"), strHost.c_str());
 	}
 }
 
